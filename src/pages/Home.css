@@ -1,0 +1,124 @@
+.layout {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+  transition: margin-left 0.3s ease;
+}
+
+.content-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0 32px 0px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  min-height: min-content;
+  padding-bottom: 16px;
+}
+
+.chat-state {
+  flex: 1;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 32px;
+}
+
+.message {
+  display: flex;
+  gap: 16px;
+  max-width: 85%;
+}
+
+.message.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message.ai {
+  align-self: flex-start;
+}
+
+.message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.message.user .message-avatar {
+  background-color: #1a237e;
+  color: white;
+}
+
+.message.ai .message-avatar {
+  background-color: var(--primary-accent);
+  color: white;
+}
+
+.message-bubble {
+  padding: 16px 20px;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.message.user .message-bubble {
+  background-color: #EBF2FA;
+  border-bottom-right-radius: 4px;
+  color: var(--text-primary);
+}
+
+.message.ai .message-bubble {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  color: var(--text-primary);
+}
+
+.composer-wrapper {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(to top, var(--bg-color) 80%, transparent);
+  padding-bottom: 12px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  z-index: 5;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+  .content-scrollable {
+    padding: 0 16px 16px;
+  }
+}

@@ -1,0 +1,168 @@
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+  margin-bottom: 32px;
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+}
+
+.hero-main-title {
+  font-family: var(--font-handwriting);
+  font-size: 100px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  transform: rotate(-12deg) translateX(-120px);
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-main-title::after {
+  content: "";
+  position: absolute;
+  bottom: 12px;
+  left: -5%;
+  width: 115%;
+  height: 8px;
+  background-color: var(--primary-accent);
+  border-radius: 4px;
+  transform: rotate(-4deg);
+  z-index: -1;
+}
+
+.hero-subtitle {
+  font-size: 36px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+  margin-top: 16px;
+  margin-left: 24px;
+}
+
+.im-text {
+  font-family: var(--font-handwriting);
+  font-size: 56px;
+  font-weight: 400;
+}
+
+.atom-text {
+  font-family: var(--font-handwriting);
+  font-size: 100px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.highlighted-text {
+  font-size: 20px;
+  font-weight: 600;
+  padding: 6px 16px;
+  background-color: #FEEFB3; /* Soft yellow highlighter */
+  border-radius: 4px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.highlighted-text::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -8px;
+  width: 16px;
+  height: 100%;
+  background-color: #FEEFB3;
+  border-radius: 50%;
+}
+.highlighted-text::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -8px;
+  width: 16px;
+  height: 100%;
+  background-color: #FEEFB3;
+  border-radius: 50%;
+}
+
+.actions-text {
+  font-family: var(--font-handwriting);
+  font-size: 22px;
+  color: var(--text-secondary);
+  word-spacing: 8px;
+}
+
+/* Decorations */
+.doodle {
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.doodle-atom {
+  top: 0px;
+  left: calc(50% + 180px);
+  width: 80px;
+  height: 80px;
+  color: var(--text-primary);
+}
+
+.doodle-text-blue {
+  font-family: var(--font-handwriting);
+  color: var(--primary-accent);
+  font-size: 22px;
+  top: 80px;
+  left: calc(50% + 260px);
+  transform: rotate(-10deg);
+  text-align: left;
+  line-height: 1.2;
+}
+
+.doodle-text-black {
+  font-family: var(--font-handwriting);
+  color: var(--text-primary);
+  font-size: 20px;
+  top: -20px;
+  left: calc(50% + 400px);
+  transform: rotate(-5deg);
+  text-align: center;
+  line-height: 1.3;
+}
+
+@media (max-width: 1024px) {
+  .doodle-text-black {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-main-title {
+    font-size: 60px;
+  }
+  .doodle-atom, .doodle-text-blue {
+    display: none;
+  }
+}
+
+.tomorrow-highlight {
+  position: relative;
+  display: inline-block;
+}
+
+.tomorrow-highlight::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #F5BE18;
+  border-radius: 2px;
+  transform: rotate(-2deg);
+  z-index: -1;
+}

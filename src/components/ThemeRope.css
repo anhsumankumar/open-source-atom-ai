@@ -1,0 +1,89 @@
+.theme-rope-wrapper {
+  position: absolute;
+  top: 0;
+  right: 140px; /* Positioned near the theme button in topbar */
+  width: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 999999;
+  pointer-events: none; /* Let clicks pass through except on the handle */
+}
+
+.theme-rope-anchor {
+  width: 14px;
+  height: 6px;
+  background-color: var(--border-color);
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.1);
+  position: absolute;
+  top: 0;
+  z-index: 2;
+}
+
+.theme-rope-line {
+  width: 2px;
+  /* height is controlled via inline style */
+  background: repeating-linear-gradient(
+    45deg,
+    #a8a29e,
+    #a8a29e 2px,
+    #d6d3d1 2px,
+    #d6d3d1 4px
+  );
+  box-shadow: 1px 0 2px rgba(0,0,0,0.1);
+  margin-top: 4px; /* Slight offset for the anchor */
+}
+
+.theme-rope-handle {
+  width: 12px;
+  height: 20px;
+  background: linear-gradient(to bottom, #f5be18, #d97706);
+  border-radius: 12px;
+  pointer-events: auto; /* Handle is grabbable */
+  cursor: grab;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15), inset -2px -2px 4px rgba(0,0,0,0.1);
+  /* transition removed to allow JS physics to instantly control position without CSS lag */
+}
+
+body.dark-theme .theme-rope-handle {
+  background: linear-gradient(to bottom, #60a5fa, #2563eb);
+}
+
+.theme-rope-handle:hover {
+  transform: scale(1.15);
+}
+
+.theme-rope-handle:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+/* View Transition Styles for the Radial Theme Reveal */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+/* The new view expands above, revealing itself through a soft mask */
+::view-transition-new(root) {
+  z-index: 9999;
+  mask-image: radial-gradient(
+    circle at var(--origin-x, 50%) var(--origin-y, 50%),
+    black 0%,
+    black calc(var(--mask-radius, 0px) - 200px),
+    transparent calc(var(--mask-radius, 0px))
+  );
+  -webkit-mask-image: radial-gradient(
+    circle at var(--origin-x, 50%) var(--origin-y, 50%),
+    black 0%,
+    black calc(var(--mask-radius, 0px) - 200px),
+    transparent calc(var(--mask-radius, 0px))
+  );
+}

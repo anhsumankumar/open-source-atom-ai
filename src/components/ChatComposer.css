@@ -1,0 +1,219 @@
+.composer-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  margin-top: 16px;
+  margin-bottom: 0px;
+}
+
+.composer-box {
+  background-color: white;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.composer-box:focus-within {
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1), 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+body.dark-theme .composer-box:focus-within {
+  box-shadow: 0 0 0 4px rgba(245, 190, 24, 0.15), 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.composer-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  color: var(--text-primary);
+  min-height: 56px;
+  max-height: 200px;
+  background: transparent;
+}
+
+.composer-input::placeholder {
+  color: #9CA3AF;
+}
+
+.composer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.actions-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-btn-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background 0.2s;
+}
+
+.icon-btn-small:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+.context-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.context-btn:hover {
+  background-color: #EAE6DB;
+}
+
+.actions-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.model-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: var(--primary-accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.send-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+}
+
+body.dark-theme .send-btn:hover {
+  box-shadow: 0 4px 12px rgba(245, 190, 24, 0.3);
+}
+
+.send-btn:active {
+  transform: scale(0.92);
+}
+
+.composer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 0 4px;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.hint-text {
+  font-size: 12px;
+  color: #9CA3AF;
+}
+
+/* Motivation Text */
+.motivation-text {
+  text-align: center;
+  margin-bottom: 12px;
+  font-family: var(--font-handwriting);
+  font-size: 20px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.motivation-highlight {
+  position: relative;
+  display: inline-block;
+}
+
+.motivation-highlight::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary-accent);
+  border-radius: 2px;
+  transform: rotate(-1deg);
+}
+
+/* Model Suggestion Banner */
+.model-suggestion-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fdfde3;
+  border: 1px solid #eab308;
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #854d0e;
+  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.1);
+}
+
+.suggestion-text {
+  font-weight: 500;
+}
+
+.suggestion-action {
+  background: white;
+  border: 1px solid #eab308;
+  color: #ca8a04;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.suggestion-action:hover {
+  background: #fef08a;
+  color: #a16207;
+}

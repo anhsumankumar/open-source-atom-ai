@@ -1,0 +1,241 @@
+:root {
+  /* Colors */
+  --bg-color: #faf3eb; /* User requested color */
+  --text-primary: #1C1C1C; /* Dark charcoal */
+  --text-secondary: #5F6368;
+  --border-color: #E6E0D4;
+  --primary-accent: #1A73E8;
+  
+  /* Feature Card Colors */
+  --card-blue: #EBF2FA;
+  --card-green: #EAF4EA;
+  --card-coral: #FCEBEA;
+  --card-lavender: #F4EEFB;
+  
+  --card-blue-hover: #E1EBFA;
+  --card-green-hover: #DFEEDA;
+  --card-coral-hover: #FADCE0;
+  --card-lavender-hover: #EAE0F8;
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-handwriting: 'Kalam', cursive;
+  
+  /* Layout */
+  --sidebar-width: 260px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  color: var(--text-primary);
+  background-color: var(--bg-color);
+  background-image: 
+    radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.06) 120%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  overflow-x: hidden;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth global transitions for all major elements */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.theme-transitioning,
+body.theme-transitioning *,
+body.theme-transitioning *::before,
+body.theme-transitioning *::after {
+  transition: none !important;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Utility Classes */
+.handwriting {
+  font-family: var(--font-handwriting);
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Animations & Keyframes */
+.fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.slide-up-fade {
+  opacity: 0;
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.scale-in {
+  opacity: 0;
+  transform: scale(0.95);
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+.pulse-glow {
+  animation: glowPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Delays */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D5CEC1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C4BCAD;
+}
+
+/* Dark Theme Variables */
+body.dark-theme {
+  --bg-color: #141311;
+  --text-primary: #f3f0eb;
+  --text-secondary: #9c9790;
+  --border-color: #2b2724;
+  --primary-accent: #f5be18;
+  
+  --card-blue: #1c1a17;
+  --card-green: #1a1c18;
+  --card-coral: #221817;
+  --card-lavender: #1d1920;
+  
+  --card-blue-hover: #272420;
+  --card-green-hover: #242721;
+  --card-coral-hover: #2e2120;
+  --card-lavender-hover: #28222b;
+  
+  /* Disable noise filter in dark mode */
+  background-image: none;
+}
+
+/* Premium Warm Aura Effect */
+body.dark-theme::before {
+  content: "";
+  position: fixed;
+  top: -20vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150vw;
+  max-width: 1600px;
+  height: 80vh;
+  background: radial-gradient(ellipse at top center, rgba(245, 190, 24, 0.15) 0%, rgba(251, 146, 60, 0.05) 45%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(60px);
+}
+
+/* Fix some specific background overrides for dark mode */
+body.dark-theme .search-container,
+body.dark-theme .model-selector-btn,
+body.dark-theme .composer-box,
+body.dark-theme .message.ai .message-bubble {
+  background-color: #1a1816;
+}
+
+body.dark-theme .model-dropdown {
+  background: #1a1816 !important;
+  background-color: #1a1816 !important;
+  opacity: 1 !important;
+}
+
+body.dark-theme .message.user .message-bubble {
+  background-color: #24211e;
+}
+
+body.dark-theme .model-categories {
+  background-color: #141311;
+}
+
+body.dark-theme .model-option.selected {
+  background-color: transparent;
+}
+
+body.dark-theme .recent-item.active {
+  background-color: rgba(245, 190, 24, 0.1);
+  color: #f5be18;
+}
+
+body.dark-theme .highlighted-text,
+body.dark-theme .highlighted-text::before,
+body.dark-theme .highlighted-text::after {
+  background-color: rgba(245, 190, 24, 0.1);
+  color: #f5be18;
+}
+
+body.dark-theme .composer-wrapper {
+  background: linear-gradient(to top, var(--bg-color) 80%, transparent);
+}

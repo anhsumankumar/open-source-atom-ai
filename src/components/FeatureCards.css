@@ -1,0 +1,99 @@
+.feature-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto 16px;
+}
+
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px 12px;
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(0,0,0,0.03);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 0;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: transparent;
+}
+
+.card-icon-container, .card-title, .card-example {
+  position: relative;
+  z-index: 1;
+}
+
+/* Card Specific Hover Glows */
+.card-blue:hover { box-shadow: 0 12px 28px rgba(26, 115, 232, 0.15); }
+.card-green:hover { box-shadow: 0 12px 28px rgba(46, 125, 50, 0.15); }
+.card-coral:hover { box-shadow: 0 12px 28px rgba(198, 40, 40, 0.15); }
+.card-lavender:hover { box-shadow: 0 12px 28px rgba(106, 27, 154, 0.15); }
+
+.card-icon-container {
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.card-example {
+  font-family: var(--font-handwriting);
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.card-blue {
+  background-color: var(--card-blue);
+  color: #1a56db;
+}
+
+.card-green {
+  background-color: var(--card-green);
+  color: #2e7d32;
+}
+
+.card-coral {
+  background-color: var(--card-coral);
+  color: #c62828;
+}
+
+.card-lavender {
+  background-color: var(--card-lavender);
+  color: #6a1b9a;
+}
+
+@media (max-width: 1024px) {
+  .feature-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .feature-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
