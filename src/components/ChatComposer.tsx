@@ -37,8 +37,11 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+      const isMobile = window.innerWidth <= 768;
+      if (!isMobile) {
+        e.preventDefault();
+        handleSend();
+      }
     }
   };
 
