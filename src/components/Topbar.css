@@ -284,9 +284,12 @@
   }
   
   .model-dropdown {
-    width: 320px;
-    max-width: calc(100vw - 32px);
-    right: 0;
+    width: calc(100vw - 32px);
+    position: fixed;
+    top: 65px;
+    left: 16px;
+    right: 16px;
+    transform-origin: top;
   }
 
   .top-avatar {

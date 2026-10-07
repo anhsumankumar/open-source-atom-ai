@@ -31,7 +31,7 @@
   flex: 1;
   width: 100%;
   min-height: min-content;
-  padding-bottom: 16px;
+  padding-bottom: 120px; /* Leave space for composer */
 }
 
 .chat-state {
@@ -124,6 +124,18 @@
     margin-left: 0;
   }
   .content-scrollable {
-    padding: 0 16px 16px;
+    padding: 0 16px 0px;
+  }
+  .composer-wrapper {
+    padding-bottom: 40px; /* Clear Netlify Badge */
+    background: var(--bg-color); /* Add background to avoid text overlap */
+    padding-top: 8px;
+  }
+  .empty-state {
+    padding-bottom: 160px;
+  }
+  .motivation-text {
+    font-size: 13px;
+    margin-bottom: 12px;
   }
 }

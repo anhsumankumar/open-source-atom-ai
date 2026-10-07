@@ -94,6 +94,23 @@
 
 @media (max-width: 640px) {
   .feature-cards-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .feature-card {
+    padding: 12px 8px;
+  }
+  
+  .card-icon-container {
+    margin-bottom: 8px;
+  }
+  
+  .card-title {
+    font-size: 12px;
+  }
+  
+  .card-example {
+    font-size: 11px;
   }
 }
