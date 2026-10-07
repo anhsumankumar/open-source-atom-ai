@@ -96,3 +96,11 @@ Designed & Built with ❤️ by **Anshuman Kumar**
 
 ## 📝 License
 This project is Open Source. Feel free to fork, modify, and use it for your engineering journey!
+
+<br />
+
+<div align="center">
+  <sub>
+    <b>Tags:</b> #React #TypeScript #AI #NVIDIA #Nemotron #Engineering #StudentCompanion #LLM #OpenSource #Vite #Supabase
+  </sub>
+</div>
