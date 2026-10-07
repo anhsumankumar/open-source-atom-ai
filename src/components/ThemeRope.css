@@ -28,6 +28,7 @@
   background: linear-gradient(to bottom, #f5be18, #d97706);
   border-radius: 12px;
   pointer-events: auto; /* Handle is grabbable */
+  touch-action: none; /* Prevents mobile pull-to-refresh when dragging */
   cursor: grab;
   box-shadow: 0 2px 4px rgba(0,0,0,0.15), inset -2px -2px 4px rgba(0,0,0,0.1);
   /* transition removed to allow JS physics to instantly control position without CSS lag */
