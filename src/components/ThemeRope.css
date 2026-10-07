@@ -1,7 +1,8 @@
 .theme-rope-wrapper {
   position: absolute;
-  top: 0;
-  right: 125px; /* Between Settings and Logout */
+  top: -16px; /* Offset Topbar padding to touch the screen top */
+  right: auto;
+  left: 0;
   width: 24px;
   height: 150px;
   z-index: 999999;
@@ -91,6 +92,8 @@ body.dark-theme .theme-rope-handle {
 
 @media (max-width: 768px) {
   .theme-rope-wrapper {
-    right: 95px; /* Between Settings (120px) and Logout (70px) */
+    top: -12px; /* Offset mobile Topbar padding */
+    right: auto;
+    left: 0;
   }
 }

@@ -130,7 +130,11 @@ export const Topbar: React.FC<TopbarProps> = ({ session, toggleSidebar, selected
           )}
         </div>
 
-        {toggleTheme && <ThemeRope toggleTheme={toggleTheme} />}
+        {toggleTheme && (
+          <div className="theme-rope-container" style={{ position: 'relative', width: '24px', height: '36px' }}>
+            <ThemeRope toggleTheme={toggleTheme} />
+          </div>
+        )}
 
         <div className="settings-wrapper" ref={settingsRef} style={{ position: 'relative' }}>
           <button className="icon-btn" onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
