@@ -127,8 +127,8 @@
     padding: 0 16px 0px;
   }
   .composer-wrapper {
-    padding-bottom: 40px; /* Clear Netlify Badge */
-    background: var(--bg-color); /* Add background to avoid text overlap */
+    padding-bottom: 70px; /* Clear Netlify Badge completely */
+    background: var(--bg-color); 
     padding-top: 8px;
   }
   .empty-state {
