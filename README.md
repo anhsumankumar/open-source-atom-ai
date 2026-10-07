@@ -74,12 +74,11 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine. You
    NVIDIA_API_KEY=your_nvidia_api_key
    ```
    💡 *Note: You can get your free NVIDIA API key by signing up at [build.nvidia.com](https://build.nvidia.com/).*  
-   This free API key gives you instant access to run the world's most powerful open-source models, including:
-   - **NVIDIA Nemotron 4 340B** (Top-tier reasoning & logic)
-   - **Meta Llama 3.1 (405B, 70B, 8B)**
-   - **Mistral (Large, Mixtral 8x22B)**
-   - **Google Gemma 2**
-   - **Microsoft Phi-3**
+   This gives you instant access to the powerful NVIDIA Nemotron models integrated natively into ATOM:
+   - **ATOM Auto** (Smartly routes your query to the best model)
+   - **Deep Engineering (Nemotron-3 Super)** (Best for 1M long context and engineering notes)
+   - **Advanced Reasoning (Nemotron-3 Ultra)** (For extremely complex problems and coding)
+   - **Fast Chat (Nemotron-3.5 Lightning)** (Lightning-fast responses for quick queries)
 
 4. **Run the development server:**
    Because ATOM uses a serverless backend proxy (Netlify Functions) to hide the NVIDIA API key securely, you should run it using the Netlify CLI:
