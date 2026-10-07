@@ -48,6 +48,14 @@ export const Home: React.FC = () => {
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   
   const scrollRef = useRef<HTMLDivElement>(null);
+  const shouldAutoScroll = useRef(true);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 150;
+    shouldAutoScroll.current = isNearBottom;
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -83,7 +91,7 @@ export const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (scrollRef.current && messages.length > 0) {
+    if (scrollRef.current && messages.length > 0 && shouldAutoScroll.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isTyping]);
@@ -121,6 +129,7 @@ export const Home: React.FC = () => {
     const newMessages = [...messages, newUserMsg];
     setMessages(newMessages);
     setIsTyping(true);
+    shouldAutoScroll.current = true; // Force auto-scroll on new message
     
     let currentConvId = activeConversationId;
     // Create conversation record if first message
@@ -260,7 +269,7 @@ export const Home: React.FC = () => {
           onOpenAboutModal={() => setIsAboutModalOpen(true)}
         />
         
-        <div className="content-scrollable" ref={scrollRef}>
+        <div className="content-scrollable" ref={scrollRef} onScroll={handleScroll}>
           {messages.length === 0 ? (
             <div className="empty-state">
               <HeroSection />
