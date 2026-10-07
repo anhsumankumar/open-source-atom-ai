@@ -204,3 +204,37 @@
 .word-16 { font-size: 80px; top: 90%; animation: slideRightAnim 40s linear infinite -28s; opacity: 0.04; }
 .word-17 { font-size: 50px; top: 5%; animation: slideLeftAnim 32s linear infinite -8s; opacity: 0.05; }
 .word-18 { font-size: 170px; top: 92%; animation: slideRightAnim 58s linear infinite -17s; opacity: 0.03; }
+
+@media (max-width: 768px) {
+  .login-container {
+    height: auto;
+    padding: 32px 16px;
+    justify-content: flex-start;
+  }
+  
+  .login-content {
+    margin-top: 24px;
+  }
+  
+  .login-footer {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    align-items: center;
+    margin-top: 48px;
+  }
+  
+  .login-prompt-text {
+    font-size: 16px;
+    text-align: center;
+  }
+  
+  .login-action-area {
+    gap: 16px;
+  }
+  
+  .google-login-btn {
+    padding: 14px 32px;
+    font-size: 16px;
+  }
+}

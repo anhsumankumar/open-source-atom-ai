@@ -143,6 +143,25 @@
 @media (max-width: 768px) {
   .hero-main-title {
     font-size: 60px;
+    transform: rotate(-10deg) translateX(-40px);
+  }
+  .hero-subtitle {
+    margin-left: 0;
+    gap: 12px;
+  }
+  .im-text {
+    font-size: 36px;
+  }
+  .atom-text {
+    font-size: 72px;
+  }
+  .highlighted-text {
+    font-size: 15px;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .actions-text {
+    font-size: 16px;
   }
   .doodle-atom, .doodle-text-blue {
     display: none;
