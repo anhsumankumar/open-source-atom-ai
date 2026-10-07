@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import type { Conversation } from '../components/Sidebar';
+import type { Session } from '@supabase/supabase-js';
 import { Topbar } from '../components/Topbar';
 import { HeroSection } from '../components/HeroSection';
 import { FeatureCards } from '../components/FeatureCards';
@@ -15,7 +16,11 @@ import { fetchConversations, fetchMessages, createConversation, saveMessage, del
 import { DEFAULT_MODEL_ID } from '../data/models';
 import './Home.css';
 
-export const Home: React.FC = () => {
+interface HomeProps {
+  session?: Session;
+}
+
+export const Home: React.FC<HomeProps> = ({ session }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
   // Chat State
@@ -248,6 +253,7 @@ export const Home: React.FC = () => {
         }}
       />
       <Sidebar 
+        session={session}
         isOpen={isSidebarOpen} 
         conversations={conversations}
         activeConversationId={activeConversationId}
@@ -258,6 +264,7 @@ export const Home: React.FC = () => {
       
       <main className="main-content">
         <Topbar 
+          session={session}
           toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
           isSidebarOpen={isSidebarOpen}
           selectedModel={selectedModel}

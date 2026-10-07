@@ -4,9 +4,11 @@ import { userProfile } from '../data/mockData';
 import { availableModels } from '../data/models';
 import { ThemeRope } from './ThemeRope';
 import { supabase } from '../lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 import './Topbar.css';
 
 interface TopbarProps {
+  session?: Session;
   toggleSidebar: () => void;
   selectedModel: string;
   onModelChange: (modelId: string) => void;
@@ -18,7 +20,7 @@ interface TopbarProps {
   isSidebarOpen?: boolean;
 }
 
-export const Topbar: React.FC<TopbarProps> = ({ toggleSidebar, selectedModel, onModelChange, isDarkTheme, toggleTheme, onOpenContextManager, onOpenPrivacyModal, onOpenAboutModal, isSidebarOpen }) => {
+export const Topbar: React.FC<TopbarProps> = ({ session, toggleSidebar, selectedModel, onModelChange, isDarkTheme, toggleTheme, onOpenContextManager, onOpenPrivacyModal, onOpenAboutModal, isSidebarOpen }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeCategory] = useState<string>('All');
@@ -169,7 +171,11 @@ export const Topbar: React.FC<TopbarProps> = ({ toggleSidebar, selectedModel, on
         </button>
 
         <div className="top-avatar">
-          {userProfile.avatar}
+          {session?.user?.user_metadata?.avatar_url ? (
+            <img src={session.user.user_metadata.avatar_url} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+          ) : (
+            session?.user?.user_metadata?.full_name?.charAt(0) || userProfile.avatar
+          )}
         </div>
       </div>
     </header>

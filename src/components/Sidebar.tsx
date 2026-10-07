@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Code, BookOpen, Plus, Info, MessageSquare } from 'lucide-react';
 import { userProfile } from '../data/mockData';
+import type { Session } from '@supabase/supabase-js';
 import './Sidebar.css';
 
 export interface Conversation {
@@ -10,6 +11,7 @@ export interface Conversation {
 }
 
 interface SidebarProps {
+  session?: Session;
   isOpen: boolean;
   conversations: Conversation[];
   activeConversationId: string | null;
@@ -19,6 +21,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
+  session,
   isOpen, 
   conversations, 
   activeConversationId, 
@@ -122,9 +125,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <div className="user-profile">
         <div className="user-info-row">
-          <div className="avatar">{userProfile.avatar}</div>
+          <div className="avatar">
+            {session?.user?.user_metadata?.avatar_url ? (
+              <img src={session.user.user_metadata.avatar_url} alt="User Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
+            ) : (
+              session?.user?.user_metadata?.full_name?.charAt(0) || userProfile.avatar
+            )}
+          </div>
           <div className="user-details">
-            <span className="user-name">{userProfile.name}</span>
+            <span className="user-name">{session?.user?.user_metadata?.full_name || userProfile.name}</span>
           </div>
         </div>
         <button className="icon-btn" onClick={onOpenAboutModal} title="About ATOM">
