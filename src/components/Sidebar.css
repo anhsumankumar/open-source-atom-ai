@@ -241,6 +241,7 @@
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     background-color: var(--bg-color);
+    z-index: 9999999;
   }
   
   .sidebar.open {

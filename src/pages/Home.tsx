@@ -230,6 +230,14 @@ export const Home: React.FC = () => {
 
   return (
     <div className="layout">
+      <div 
+        className={`mobile-sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
+        onClick={() => {
+          if (window.innerWidth <= 768) {
+            setIsSidebarOpen(false);
+          }
+        }}
+      />
       <Sidebar 
         isOpen={isSidebarOpen} 
         conversations={conversations}
@@ -242,6 +250,7 @@ export const Home: React.FC = () => {
       <main className="main-content">
         <Topbar 
           toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
+          isSidebarOpen={isSidebarOpen}
           selectedModel={selectedModel}
           onModelChange={handleModelChange}
           isDarkTheme={isDarkTheme}

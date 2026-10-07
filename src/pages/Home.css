@@ -5,6 +5,10 @@
   overflow: hidden;
 }
 
+.mobile-sidebar-overlay {
+  display: none;
+}
+
 .main-content {
   flex: 1;
   margin-left: var(--sidebar-width);
@@ -137,5 +141,19 @@
   .motivation-text {
     font-size: 13px;
     margin-bottom: 12px;
+  }
+  .mobile-sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 9999998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .mobile-sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
   }
 }

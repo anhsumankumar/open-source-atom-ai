@@ -15,9 +15,10 @@ interface TopbarProps {
   onOpenContextManager?: () => void;
   onOpenPrivacyModal?: () => void;
   onOpenAboutModal?: () => void;
+  isSidebarOpen?: boolean;
 }
 
-export const Topbar: React.FC<TopbarProps> = ({ toggleSidebar, selectedModel, onModelChange, isDarkTheme, toggleTheme, onOpenContextManager, onOpenPrivacyModal, onOpenAboutModal }) => {
+export const Topbar: React.FC<TopbarProps> = ({ toggleSidebar, selectedModel, onModelChange, isDarkTheme, toggleTheme, onOpenContextManager, onOpenPrivacyModal, onOpenAboutModal, isSidebarOpen }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeCategory] = useState<string>('All');
@@ -64,7 +65,11 @@ export const Topbar: React.FC<TopbarProps> = ({ toggleSidebar, selectedModel, on
   };
   return (
     <header className="topbar">
-      <button className="icon-btn sidebar-toggle-btn mobile-only" onClick={toggleSidebar}>
+      <button 
+        className="icon-btn sidebar-toggle-btn mobile-only" 
+        onClick={toggleSidebar}
+        style={{ visibility: isSidebarOpen ? 'hidden' : 'visible' }}
+      >
         <Menu size={24} color="var(--text-primary)" />
       </button>
       <div className="search-container desktop-only">
