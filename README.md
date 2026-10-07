@@ -73,6 +73,7 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your machine. You
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    NVIDIA_API_KEY=your_nvidia_api_key
    ```
+   💡 *Note: You can get your free NVIDIA API key by signing up at [build.nvidia.com](https://build.nvidia.com/).*
 
 4. **Run the development server:**
    Because ATOM uses a serverless backend proxy (Netlify Functions) to hide the NVIDIA API key securely, you should run it using the Netlify CLI:
