@@ -15,6 +15,31 @@
 ## 🌟 Overview
 ATOM is a state-of-the-art, premium AI Engineering Companion. Designed with an incredibly aesthetic and responsive UI, ATOM helps you solve complex problems, explain tough concepts, summarize dense engineering notes, and generate intelligent code using the power of **NVIDIA's advanced LLMs (Nemotron, Llama 3, Mixtral)**.
 
+## 📸 App Gallery
+
+<div align="center">
+  <img src="https://via.placeholder.com/1200x800/FDFBF7/1C1C1C?text=Replace+this+with+Login+Screen+Screenshot+(login-screen.png)" alt="ATOM Login Screen" width="100%" style="border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
+  <p><i>The beautifully crafted, interactive Login Screen with dynamic floating backgrounds.</i></p>
+</div>
+
+<br/>
+
+<div align="center">
+  <table style="width: 100%;">
+    <tr>
+      <th align="center">☀️ Engineering Mode (Light)</th>
+      <th align="center">🌙 Focus Mode (Dark)</th>
+    </tr>
+    <tr>
+      <td><img src="https://via.placeholder.com/600x400/FDFBF7/1C1C1C?text=Replace+with+Light+Mode.png" alt="Light Mode" width="100%" style="border-radius: 8px;" /></td>
+      <td><img src="https://via.placeholder.com/600x400/141311/F5BE18?text=Replace+with+Dark+Mode.png" alt="Dark Mode" width="100%" style="border-radius: 8px;" /></td>
+    </tr>
+  </table>
+  <p><i>Toggle seamlessly between themes using the custom physics-based mechanical rope switch!</i></p>
+</div>
+
+---
+
 ## ✨ Features
 - 🎨 **Premium Aesthetic UI:** A beautifully designed interface with glassmorphism, dynamic floating background effects, and a buttery-smooth dark/light mode toggle.
 - 🧠 **NVIDIA AI Powered:** Integrated natively with NVIDIA's inference API for lightning-fast reasoning and problem-solving.
