@@ -91,6 +91,6 @@ body.dark-theme .theme-rope-handle {
 
 @media (max-width: 768px) {
   .theme-rope-wrapper {
-    right: 70px; /* Adjust for mobile */
+    right: 120px; /* Shift further left so it doesn't overlap Logout or Settings */
   }
 }
