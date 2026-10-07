@@ -18,7 +18,7 @@ ATOM is a state-of-the-art, premium AI Engineering Companion. Designed with an i
 ## 📸 App Gallery
 
 <div align="center">
-  <img src="./Sample%20Images/login_screen.png" alt="ATOM Login Screen" width="100%" style="border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
+  <img src="./Sample%20Images/Login_screen.png" alt="ATOM Login Screen" width="100%" style="border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
   <p><i>The beautifully crafted, interactive Login Screen with dynamic floating backgrounds.</i></p>
 </div>
 
