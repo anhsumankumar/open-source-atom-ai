@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Heart, Globe } from 'lucide-react';
-import { HeroSection } from '../components/HeroSection';
-import { TermsModal } from '../components/TermsModal';
+import { HeroSection } from '../components/chat/HeroSection';
+import { TermsModal } from '../components/modals/TermsModal';
 import './Login.css';
 
 export const Login: React.FC = () => {

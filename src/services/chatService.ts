@@ -1,5 +1,5 @@
 import { supabase, getCurrentUserId } from '../lib/supabase';
-import type { Conversation } from '../components/Sidebar';
+import type { Conversation } from '../components/layout/Sidebar';
 import type { ChatMessage } from './nvidiaService';
 
 export const fetchConversations = async (): Promise<Conversation[]> => {

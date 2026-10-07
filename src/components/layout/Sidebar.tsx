@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Code, BookOpen, Plus, Info, MessageSquare } from 'lucide-react';
-import { userProfile } from '../data/mockData';
+import { userProfile } from '../../data/mockData';
 import type { Session } from '@supabase/supabase-js';
 import './Sidebar.css';
 

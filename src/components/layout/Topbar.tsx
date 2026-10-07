@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Settings, Menu, Monitor, ChevronDown, Check, Zap, Eye, Code2, BrainCircuit, Box, Sparkles, LogOut } from 'lucide-react';
-import { userProfile } from '../data/mockData';
-import { availableModels } from '../data/models';
+import { userProfile } from '../../data/mockData';
+import { availableModels } from '../../data/models';
 import { ThemeRope } from './ThemeRope';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import type { Session } from '@supabase/supabase-js';
 import './Topbar.css';
 
