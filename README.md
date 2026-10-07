@@ -18,7 +18,7 @@ ATOM is a state-of-the-art, premium AI Engineering Companion. Designed with an i
 ## 📸 App Gallery
 
 <div align="center">
-  <img src="https://via.placeholder.com/1200x800/FDFBF7/1C1C1C?text=Replace+this+with+Login+Screen+Screenshot+(login-screen.png)" alt="ATOM Login Screen" width="100%" style="border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
+  <img src="./Sample%20Images/login_screen.png" alt="ATOM Login Screen" width="100%" style="border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
   <p><i>The beautifully crafted, interactive Login Screen with dynamic floating backgrounds.</i></p>
 </div>
 
@@ -31,8 +31,8 @@ ATOM is a state-of-the-art, premium AI Engineering Companion. Designed with an i
       <th align="center">🌙 Focus Mode (Dark)</th>
     </tr>
     <tr>
-      <td><img src="https://via.placeholder.com/600x400/FDFBF7/1C1C1C?text=Replace+with+Light+Mode.png" alt="Light Mode" width="100%" style="border-radius: 8px;" /></td>
-      <td><img src="https://via.placeholder.com/600x400/141311/F5BE18?text=Replace+with+Dark+Mode.png" alt="Dark Mode" width="100%" style="border-radius: 8px;" /></td>
+      <td><img src="./Sample%20Images/light_mode.png" alt="Light Mode" width="100%" style="border-radius: 8px;" /></td>
+      <td><img src="./Sample%20Images/dark_mode.png" alt="Dark Mode" width="100%" style="border-radius: 8px;" /></td>
     </tr>
   </table>
   <p><i>Toggle seamlessly between themes using the custom physics-based mechanical rope switch!</i></p>
