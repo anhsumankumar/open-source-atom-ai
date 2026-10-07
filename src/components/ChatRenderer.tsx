@@ -16,7 +16,9 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({ content, isUser, rea
     return (
       <div className="message user-message">
         <div className="message-content handwriting-text">
-          {content}
+          <div className="message-bubble">
+            {content}
+          </div>
         </div>
       </div>
     );
@@ -53,6 +55,7 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({ content, isUser, rea
                 </code>
               );
             },
+            p: ({ children }) => <div className="markdown-p">{children}</div>,
             a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" />,
           }}
         >

@@ -37,7 +37,7 @@
 .chat-state {
   flex: 1;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -106,12 +106,17 @@
 .composer-wrapper {
   position: sticky;
   bottom: 0;
-  background: linear-gradient(to top, var(--bg-color) 80%, transparent);
-  padding-bottom: 12px;
+  padding-top: 16px;
+  padding-bottom: 24px;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   z-index: 5;
+  pointer-events: none; /* allow clicking through the empty space */
+}
+
+.composer-wrapper > * {
+  pointer-events: auto; /* re-enable clicks on the actual chatbox */
 }
 
 @media (max-width: 768px) {

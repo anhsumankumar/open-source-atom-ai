@@ -1,0 +1,206 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: #FDFBF7;
+  color: #202124;
+  font-family: var(--font-ui, 'Inter', sans-serif);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  width: 100%;
+}
+
+.login-action-area {
+  margin-top: 8px; /* Reduced space between hero section and login area */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.login-divider {
+  width: 100%;
+  max-width: 320px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.15), transparent);
+  border: none;
+  margin: 0;
+}
+
+.login-prompt-text {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #4a4d52;
+}
+
+.login-terms-text {
+  margin: 8px 0 0 0;
+  font-size: 12px;
+  color: #8c8c8c;
+  text-align: center;
+  line-height: 1.6;
+  max-width: 420px;
+}
+
+.login-terms-text a {
+  color: #F5BE18; /* Exact ATOM yellow from mockup */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+  border-bottom: none;
+  transition: all 0.2s;
+}
+
+.login-terms-text a:hover {
+  color: #d97706;
+}
+
+.google-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 40px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 99px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.google-login-btn:hover {
+  background-color: #202124;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
+}
+
+.google-login-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.google-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+}
+
+@keyframes floatOrb {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-10px); }
+}
+
+.login-footer {
+  position: absolute;
+  bottom: 24px;
+  right: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  z-index: 10;
+}
+
+.login-footer p {
+  margin: 0;
+  font-size: 13px;
+  color: #5f6368;
+  display: flex;
+  align-items: center;
+}
+
+.login-footer p span {
+  color: #000000;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.login-socials {
+  display: flex;
+  gap: 12px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #5f6368;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.social-link:hover {
+  background-color: #000000;
+  color: #ffffff;
+  transform: translateY(-2px);
+  border-color: #000000;
+}
+
+/* Floating Background Words */
+.floating-bg-words {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1; /* Stay behind the login content */
+}
+
+.float-word {
+  position: absolute;
+  font-family: var(--font-handwriting, 'Outfit', sans-serif);
+  color: #000000;
+  opacity: 0.03; /* Extremely faded */
+  font-weight: 800;
+  white-space: nowrap;
+  user-select: none;
+}
+
+@keyframes slideRightAnim {
+  from { transform: translateX(-50vw); }
+  to { transform: translateX(120vw); }
+}
+
+@keyframes slideLeftAnim {
+  from { transform: translateX(120vw); }
+  to { transform: translateX(-50vw); }
+}
+
+.word-1 { font-size: 240px; top: 5%; animation: slideRightAnim 55s linear infinite -15s; opacity: 0.02; }
+.word-2 { font-size: 60px; top: 18%; animation: slideLeftAnim 40s linear infinite -20s; opacity: 0.04; }
+.word-3 { font-size: 140px; top: 25%; animation: slideRightAnim 60s linear infinite -30s; opacity: 0.03; }
+.word-4 { font-size: 45px; top: 38%; animation: slideLeftAnim 45s linear infinite -10s; opacity: 0.05; }
+.word-5 { font-size: 200px; top: 48%; animation: slideLeftAnim 70s linear infinite -40s; opacity: 0.02; }
+.word-6 { font-size: 70px; top: 60%; animation: slideRightAnim 38s linear infinite -5s; opacity: 0.04; }
+.word-7 { font-size: 160px; top: 70%; animation: slideRightAnim 65s linear infinite -25s; opacity: 0.03; }
+.word-8 { font-size: 90px; top: 85%; animation: slideLeftAnim 48s linear infinite -35s; opacity: 0.03; }
+.word-9 { font-size: 280px; top: 12%; animation: slideLeftAnim 80s linear infinite -50s; opacity: 0.02; }
+.word-10 { font-size: 55px; top: 22%; animation: slideRightAnim 35s linear infinite -12s; opacity: 0.05; }
+.word-11 { font-size: 110px; top: 32%; animation: slideRightAnim 42s linear infinite -45s; opacity: 0.03; }
+.word-12 { font-size: 40px; top: 42%; animation: slideLeftAnim 30s linear infinite -22s; opacity: 0.04; }
+.word-13 { font-size: 220px; top: 52%; animation: slideRightAnim 75s linear infinite -60s; opacity: 0.02; }
+.word-14 { font-size: 65px; top: 65%; animation: slideLeftAnim 36s linear infinite -18s; opacity: 0.04; }
+.word-15 { font-size: 130px; top: 78%; animation: slideLeftAnim 50s linear infinite -5s; opacity: 0.03; }
+.word-16 { font-size: 80px; top: 90%; animation: slideRightAnim 40s linear infinite -28s; opacity: 0.04; }
+.word-17 { font-size: 50px; top: 5%; animation: slideLeftAnim 32s linear infinite -8s; opacity: 0.05; }
+.word-18 { font-size: 170px; top: 92%; animation: slideRightAnim 58s linear infinite -17s; opacity: 0.03; }

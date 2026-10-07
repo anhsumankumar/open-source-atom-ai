@@ -13,28 +13,28 @@ export const FeatureCards: React.FC<FeatureCardsProps> = ({ onCardClick }) => {
       example: 'e.g. What is\nFourier Transform?',
       icon: BookOpen,
       colorClass: 'card-blue',
-      prompt: 'What concept would you like me to explain?'
+      prompt: 'Can you explain the concept of [insert topic here] in simple terms?'
     },
     {
       title: 'Solve a Problem',
       example: 'e.g. Solve this\ncircuit question',
       icon: Sigma,
       colorClass: 'card-green',
-      prompt: 'Send me the problem you want to solve.'
+      prompt: 'I need help solving this problem:\n\n'
     },
     {
       title: 'Summarize Notes',
       example: 'e.g. Make short notes\non Fluid Mechanics',
       icon: FileText,
       colorClass: 'card-coral',
-      prompt: 'Upload or paste the notes you want summarized.'
+      prompt: 'Please summarize the following notes for me:\n\n'
     },
     {
       title: 'Get Study Plan',
       example: 'e.g. Plan for\nSemester Exams',
       icon: Lightbulb,
       colorClass: 'card-lavender',
-      prompt: 'Tell me your subject and exam timeline.'
+      prompt: 'Can you help me create a study plan? The subject is [insert subject] and I have [insert time] left before the exam.'
     }
   ];
 

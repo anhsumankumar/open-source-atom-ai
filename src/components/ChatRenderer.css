@@ -26,28 +26,43 @@
 
 /* User message specific styling */
 .user-message .message-content {
-  color: var(--primary-accent);
-  padding-right: 12px;
-  border-right: 2px solid var(--primary-accent);
+  color: var(--text-primary);
   text-align: right;
-  /* Add a subtle rotation for a handwritten feel */
-  transform: rotate(-1deg);
 }
 
 /* ATOM message specific styling */
 .atom-message .message-content {
   color: var(--text-primary);
-  padding-left: 12px;
-  border-left: 2px solid #E6E0D4;
+  text-align: left;
+}
+
+/* Message Bubble (Only for User now) */
+.message-bubble {
+  padding: 16px 20px;
+  border-radius: 20px;
+  display: inline-block;
+  text-align: left;
+}
+
+.user-message .message-bubble {
+  background-color: var(--card-blue);
+  border-bottom-right-radius: 4px;
+}
+
+body.dark-theme .user-message .message-bubble {
+  background-color: #0f172a; /* dark blue */
+  color: #e2e8f0;
 }
 
 /* Markdown styling overrides */
-.atom-message .message-content p {
+.atom-message .message-content p,
+.atom-message .message-content .markdown-p {
   margin-top: 0;
   margin-bottom: 16px;
 }
 
-.atom-message .message-content p:last-child {
+.atom-message .message-content p:last-child,
+.atom-message .message-content .markdown-p:last-child {
   margin-bottom: 0;
 }
 
@@ -81,6 +96,10 @@
   color: #000;
 }
 
+body.dark-theme .atom-message .message-content strong {
+  color: #fff;
+}
+
 /* Code blocks (override handwriting font) */
 .code-block-wrapper {
   margin: 16px 0;
@@ -100,6 +119,11 @@
   text-transform: uppercase;
 }
 
+body.dark-theme .code-block-header {
+  background-color: #1a1816;
+  color: #a3a3a3;
+}
+
 .code-block {
   margin: 0;
   padding: 16px;
@@ -108,12 +132,21 @@
   font-size: 14px;
 }
 
+body.dark-theme .code-block {
+  background-color: #141311;
+  color: #e5e5e5;
+}
+
 .inline-code {
   font-family: 'Courier New', Courier, monospace;
   background-color: rgba(0, 0, 0, 0.05);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.9em;
+}
+
+body.dark-theme .inline-code {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* KaTeX styling tweaks */

@@ -1,6 +1,6 @@
 .composer-container {
   width: 100%;
-  max-width: 1000px;
+  max-width: 800px;
   margin: 0 auto;
   position: relative;
   margin-top: 16px;
@@ -9,8 +9,8 @@
 
 .composer-box {
   background-color: white;
-  border-radius: 20px;
-  padding: 16px;
+  border-radius: 32px;
+  padding: 12px 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border-color);
   display: flex;
@@ -35,9 +35,10 @@ body.dark-theme .composer-box:focus-within {
   font-family: var(--font-ui);
   font-size: 16px;
   color: var(--text-primary);
-  min-height: 56px;
-  max-height: 200px;
+  min-height: 24px;
+  max-height: 150px;
   background: transparent;
+  line-height: 1.5;
 }
 
 .composer-input::placeholder {
@@ -107,9 +108,9 @@ body.dark-theme .composer-box:focus-within {
 }
 
 .send-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
   background-color: var(--primary-accent);
   color: white;
   display: flex;
@@ -135,8 +136,13 @@ body.dark-theme .send-btn:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12px;
-  padding: 0 4px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+body.dark-theme .composer-footer {
+  border-top-color: rgba(255,255,255,0.05);
 }
 
 .checkbox-wrapper {
@@ -216,4 +222,26 @@ body.dark-theme .send-btn:hover {
 .suggestion-action:hover {
   background: #fef08a;
   color: #a16207;
+}
+
+@media (max-width: 768px) {
+  .composer-box {
+    padding: 12px;
+  }
+  .composer-actions {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .composer-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .hint-text {
+    display: none; /* Hide 'Shift + Enter to new line' on mobile */
+  }
+  .motivation-text {
+    font-size: 16px;
+    padding: 0 16px;
+  }
 }

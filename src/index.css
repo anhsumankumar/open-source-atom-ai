@@ -1,6 +1,6 @@
 :root {
   /* Colors */
-  --bg-color: #faf3eb; /* User requested color */
+  --bg-color: #FDFBF7; /* Updated to match Login screen exactly */
   --text-primary: #1C1C1C; /* Dark charcoal */
   --text-secondary: #5F6368;
   --border-color: #E6E0D4;
@@ -236,6 +236,4 @@ body.dark-theme .highlighted-text::after {
   color: #f5be18;
 }
 
-body.dark-theme .composer-wrapper {
-  background: linear-gradient(to top, var(--bg-color) 80%, transparent);
-}
+

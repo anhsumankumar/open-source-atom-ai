@@ -1,11 +1,9 @@
 .theme-rope-wrapper {
   position: absolute;
   top: 0;
-  right: 140px; /* Positioned near the theme button in topbar */
+  right: 125px; /* Between Settings and Logout */
   width: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  height: 150px;
   z-index: 999999;
   pointer-events: none; /* Let clicks pass through except on the handle */
 }
@@ -19,21 +17,9 @@
   box-shadow: inset 0 -2px 4px rgba(0,0,0,0.1);
   position: absolute;
   top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 2;
-}
-
-.theme-rope-line {
-  width: 2px;
-  /* height is controlled via inline style */
-  background: repeating-linear-gradient(
-    45deg,
-    #a8a29e,
-    #a8a29e 2px,
-    #d6d3d1 2px,
-    #d6d3d1 4px
-  );
-  box-shadow: 1px 0 2px rgba(0,0,0,0.1);
-  margin-top: 4px; /* Slight offset for the anchor */
 }
 
 .theme-rope-handle {
@@ -45,6 +31,20 @@
   cursor: grab;
   box-shadow: 0 2px 4px rgba(0,0,0,0.15), inset -2px -2px 4px rgba(0,0,0,0.1);
   /* transition removed to allow JS physics to instantly control position without CSS lag */
+  position: absolute;
+  top: 0; /* base, offset by JS */
+  left: 50%;
+}
+
+/* Expand the hit area so it's easier to grab */
+.theme-rope-handle::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  bottom: -20px;
+  left: -15px;
+  right: -15px;
+  border-radius: 30px;
 }
 
 body.dark-theme .theme-rope-handle {
@@ -86,4 +86,10 @@ body.dark-theme .theme-rope-handle {
     black calc(var(--mask-radius, 0px) - 200px),
     transparent calc(var(--mask-radius, 0px))
   );
+}
+
+@media (max-width: 768px) {
+  .theme-rope-wrapper {
+    right: 70px; /* Adjust for mobile */
+  }
 }

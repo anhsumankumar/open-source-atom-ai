@@ -3,58 +3,125 @@ import { flushSync } from 'react-dom';
 import './ThemeRope.css';
 
 interface ThemeRopeProps {
-  isDarkTheme: boolean;
   toggleTheme: () => void;
 }
 
-export const ThemeRope: React.FC<ThemeRopeProps> = ({ isDarkTheme, toggleTheme }) => {
+export const ThemeRope: React.FC<ThemeRopeProps> = ({ toggleTheme }) => {
   const isTransitioning = useRef(false);
   
-  // DOM Refs for direct manipulation (bypass React state for 60fps physics)
-  const ropeContainerRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
+  // DOM Refs
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
+  const handleRef = useRef<HTMLDivElement>(null);
   
-  // Physics State
+  const NUM_POINTS = 12;
+  const SEG_LENGTH = 5;
+
   const physics = useRef({
-    currentY: 0,
-    targetY: 0,
-    velocityY: 0,
-    swayAngle: 0,
-    swayVelocity: 0,
+    points: Array.from({length: NUM_POINTS}, (_, i) => ({
+      x: 50, y: i * SEG_LENGTH + 3, oldX: 50, oldY: i * SEG_LENGTH + 3, pinned: i === 0
+    })),
+    mouseX: 50,
+    mouseY: (NUM_POINTS - 1) * SEG_LENGTH + 3,
     isDragging: false,
     hasActivated: false,
-    startY: 0
+    dragStartX: 0,
+    dragStartY: 0,
+    grabTargetX: 50,
+    grabTargetY: (NUM_POINTS - 1) * SEG_LENGTH + 3,
+    currentSegLength: SEG_LENGTH
   });
 
   const frameId = useRef<number>(0);
 
-  // Physics Loop
+  // Flexible Rope Physics Engine
   useEffect(() => {
     const loop = () => {
       const p = physics.current;
       
-      // Vertical Spring Physics
-      // Stiffness determines how closely currentY follows targetY.
-      // Damping determines how much it bounces when released.
-      const forceY = (p.targetY - p.currentY) * 0.25; 
-      p.velocityY = (p.velocityY + forceY) * 0.65; 
-      p.currentY += p.velocityY;
-      
-      // Sway (Pendulum) Physics
-      if (!p.isDragging) {
-        // Gravity pulls angle back to 0
-        p.swayVelocity -= p.swayAngle * 0.15; 
-        p.swayVelocity *= 0.90; // Air resistance/damping
-        p.swayAngle += p.swayVelocity;
-      } else {
-        // Dampen sway heavily while being held
-        p.swayAngle *= 0.7; 
+      // 1. Verlet Integration (Gravity & Inertia)
+      for (let i = 0; i < p.points.length; i++) {
+        const pt = p.points[i];
+        if (pt.pinned) {
+          pt.x = 50; 
+          pt.y = 3; // Start slightly below anchor
+          continue;
+        }
+        
+        // Air resistance / friction (increased damping for slower, heavier feel)
+        const vx = (pt.x - pt.oldX) * 0.80; 
+        const vy = (pt.y - pt.oldY) * 0.80;
+        
+        pt.oldX = pt.x;
+        pt.oldY = pt.y;
+        
+        pt.x += vx;
+        pt.y += vy + 0.4; // Softer gravity
       }
-
-      // Render to DOM
-      if (ropeContainerRef.current && lineRef.current) {
-        lineRef.current.style.height = `${Math.max(4, 40 + p.currentY)}px`;
-        ropeContainerRef.current.style.transform = `rotate(${p.swayAngle}deg)`;
+      
+      // 2. Mouse Pull (Strong tracking on Handle during drag)
+      if (p.isDragging) {
+        const last = p.points[p.points.length - 1];
+        last.x += (p.mouseX - last.x) * 0.8; // Closely follow pointer
+        last.y += (p.mouseY - last.y) * 0.8;
+        
+        // Dynamically allow the rope to stretch so it can travel downward freely
+        const dist = Math.max(0, p.mouseY - p.points[0].y);
+        const resting = (NUM_POINTS - 1) * SEG_LENGTH;
+        let targetSeg = SEG_LENGTH;
+        if (dist > resting) {
+           targetSeg = dist / (NUM_POINTS - 1);
+        }
+        // Quickly stretch during drag
+        p.currentSegLength += (targetSeg - p.currentSegLength) * 0.5;
+      } else {
+        // Slowly return to resting length after release for a natural, soft recoil
+        p.currentSegLength += (SEG_LENGTH - p.currentSegLength) * 0.08;
+      }
+      
+      // 3. Constraints (Rigid Links)
+      for (let k = 0; k < 15; k++) { // Fewer iterations = slight natural elasticity
+        for (let i = 0; i < p.points.length - 1; i++) {
+          const pt1 = p.points[i];
+          const pt2 = p.points[i + 1];
+          
+          const dx = pt2.x - pt1.x;
+          const dy = pt2.y - pt1.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist > 0) {
+            const diff = p.currentSegLength - dist;
+            const percent = (diff / dist) / 2;
+            const offsetX = dx * percent;
+            const offsetY = dy * percent;
+            
+            if (!pt1.pinned) {
+              pt1.x -= offsetX;
+              pt1.y -= offsetY;
+            }
+            if (!pt2.pinned) {
+              pt2.x += offsetX;
+              pt2.y += offsetY;
+            }
+          }
+        }
+      }
+      
+      // 4. Render to DOM
+      if (pathRef.current && handleRef.current) {
+        let d = `M ${p.points[0].x} ${p.points[0].y}`;
+        // Using bezier curves makes it look perfectly soft and round
+        for (let i = 1; i < p.points.length - 1; i++) {
+          const xc = (p.points[i].x + p.points[i + 1].x) / 2;
+          const yc = (p.points[i].y + p.points[i + 1].y) / 2;
+          d += ` Q ${p.points[i].x} ${p.points[i].y}, ${xc} ${yc}`;
+        }
+        const last = p.points[p.points.length - 1];
+        d += ` L ${last.x} ${last.y}`;
+        
+        pathRef.current.setAttribute('d', d);
+        
+        handleRef.current.style.transform = `translate(calc(-50% + ${last.x - 50}px), ${last.y}px)`;
       }
 
       frameId.current = requestAnimationFrame(loop);
@@ -68,33 +135,38 @@ export const ThemeRope: React.FC<ThemeRopeProps> = ({ isDarkTheme, toggleTheme }
     if (isTransitioning.current) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     
-    physics.current.isDragging = true;
-    physics.current.hasActivated = false;
+    const p = physics.current;
+    p.isDragging = true;
+    p.hasActivated = false;
     
-    // We base startY on the *raw pointer*, offsetting by the current target
-    // so if they grab it while it's bouncing, it doesn't snap.
-    physics.current.startY = e.clientY - physics.current.targetY;
+    p.dragStartX = e.clientX;
+    p.dragStartY = e.clientY;
+    
+    const last = p.points[p.points.length - 1];
+    p.mouseX = last.x;
+    p.mouseY = last.y;
+    
+    p.grabTargetX = p.mouseX;
+    p.grabTargetY = p.mouseY;
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
     const p = physics.current;
     if (!p.isDragging || p.hasActivated) return;
     
-    const rawY = Math.max(0, e.clientY - p.startY);
+    const dx = e.clientX - p.dragStartX;
+    const dy = e.clientY - p.dragStartY;
     
-    // Variable Pull Resistance (makes it feel like a mechanical switch)
-    let pull = rawY;
-    if (rawY > 20) {
-      pull = 20 + (rawY - 20) * 0.5; // Starts getting heavier
-    }
-    if (rawY > 40) {
-      pull = 20 + (20 * 0.5) + (rawY - 40) * 0.15; // Very heavy near threshold
-    }
+    // Direct 1:1 mapping on Y for strong drag control
+    p.mouseX = p.grabTargetX + dx * 0.5; // Dampen horizontal movement slightly
+    p.mouseY = p.grabTargetY + dy;
     
-    p.targetY = pull;
-
-    // Activation Threshold
-    if (pull > 38 && !p.hasActivated) { 
+    // Calculate total pull distance from the natural resting position
+    const restingY = (NUM_POINTS - 1) * SEG_LENGTH + 3;
+    const pullDist = p.mouseY - restingY;
+    
+    // Activation Threshold (requires a deliberate ~75px pull)
+    if (pullDist > 75 && !p.hasActivated) { 
       activateSwitch(e.clientX, e.clientY);
     }
   };
@@ -103,7 +175,6 @@ export const ThemeRope: React.FC<ThemeRopeProps> = ({ isDarkTheme, toggleTheme }
     const p = physics.current;
     if (p.isDragging) {
       p.isDragging = false;
-      p.targetY = 0; // Spring back to 0
     }
   };
 
@@ -112,21 +183,17 @@ export const ThemeRope: React.FC<ThemeRopeProps> = ({ isDarkTheme, toggleTheme }
     p.hasActivated = true;
     p.isDragging = false;
     
-    // Mechanical Snap & Recoil Simulation
-    // 1. Instantly force the rope down a bit more (the "catch")
-    p.currentY += 8; 
-    // 2. Apply a violent upward velocity (the "snap/recoil")
-    p.velocityY = -18; 
-    // 3. Reset target to 0
-    p.targetY = 0;
-    // 4. Introduce a side-to-side sway kick from the recoil
-    p.swayVelocity = (Math.random() > 0.5 ? 1 : -1) * 12; 
-
-    // Haptic mechanical tick (if supported on mobile)
-    if (navigator.vibrate) {
-      navigator.vibrate(15);
-    }
-
+    const last = p.points[p.points.length - 1];
+    
+    // Tiny mechanical catch/click at handle
+    last.y += 4; 
+    // Soft upward recoil impulse (the rest is handled by currentSegLength shrinking)
+    last.oldY = last.y + 6; 
+    // Slight side sway kick
+    last.oldX += (Math.random() > 0.5 ? 1 : -1) * 5; 
+    
+    if (navigator.vibrate) navigator.vibrate(10);
+    
     triggerThemeSwitch(x, y);
   };
 
@@ -170,7 +237,7 @@ export const ThemeRope: React.FC<ThemeRopeProps> = ({ isDarkTheme, toggleTheme }
       document.documentElement.style.setProperty('--origin-x', `${x}px`);
       document.documentElement.style.setProperty('--origin-y', `${y}px`);
       
-      const duration = 1800;
+      const duration = 900;
       let start = performance.now();
       
       function tick(now: number) {
@@ -198,22 +265,25 @@ export const ThemeRope: React.FC<ThemeRopeProps> = ({ isDarkTheme, toggleTheme }
   };
   
   return (
-    <div className="theme-rope-wrapper">
+    <div className="theme-rope-wrapper" ref={wrapperRef}>
       <div className="theme-rope-anchor" />
-      <div 
-        className="theme-rope-sway-container" 
-        ref={ropeContainerRef}
-        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', transformOrigin: 'top center' }}
+      <svg 
+        className="theme-rope-svg" 
+        width="100" 
+        height="150" 
+        style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none', overflow: 'visible', zIndex: 1 }}
       >
-        <div className="theme-rope-line" ref={lineRef} />
-        <div 
-          className="theme-rope-handle"
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-        />
-      </div>
+        <path ref={pathRef} stroke="#a8a29e" strokeWidth="2.5" fill="none" strokeDasharray="5 3" strokeLinecap="round" />
+      </svg>
+      <div 
+        className="theme-rope-handle"
+        ref={handleRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        style={{ zIndex: 3 }}
+      />
     </div>
   );
 };

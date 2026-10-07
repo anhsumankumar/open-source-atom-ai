@@ -1,5 +1,5 @@
-import React from 'react';
-import { Code, BookOpen, Plus, Settings, MessageSquare } from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+import { Code, BookOpen, Plus, Info, MessageSquare } from 'lucide-react';
 import { userProfile } from '../data/mockData';
 import './Sidebar.css';
 
@@ -15,6 +15,7 @@ interface SidebarProps {
   activeConversationId: string | null;
   onNewChat: () => void;
   onSelectConversation: (id: string) => void;
+  onOpenAboutModal: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
@@ -22,8 +23,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
   conversations, 
   activeConversationId, 
   onNewChat, 
-  onSelectConversation 
+  onSelectConversation,
+  onOpenAboutModal
 }) => {
+  const isResizing = useRef(false);
+
+  const startResizing = () => {
+    isResizing.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.addEventListener('mousemove', resize);
+    document.addEventListener('mouseup', stopResizing);
+  };
+
+  const resize = (e: MouseEvent) => {
+    if (isResizing.current) {
+      let newWidth = e.clientX;
+      if (newWidth < 200) newWidth = 200; // min width
+      if (newWidth > 600) newWidth = 600; // max width
+      document.documentElement.style.setProperty('--sidebar-width', `${newWidth}px`);
+    }
+  };
+
+  const stopResizing = () => {
+    isResizing.current = false;
+    document.body.style.cursor = 'default';
+    document.removeEventListener('mousemove', resize);
+    document.removeEventListener('mouseup', stopResizing);
+  };
+
+  // Cleanup event listeners on unmount
+  useEffect(() => {
+    return () => {
+      document.removeEventListener('mousemove', resize);
+      document.removeEventListener('mouseup', stopResizing);
+    };
+  }, []);
+
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="brand">
@@ -44,7 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="mode-switcher">
-        <button className="mode-btn">
+        <button className="mode-btn" onClick={() => alert("Developer Mode coming soon! 🛠️")}>
           <Code size={18} />
           <span>Developer Mode</span>
         </button>
@@ -59,7 +94,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <Plus size={18} />
           <span>New Chat</span>
         </div>
-        <span className="shortcut">Ctrl + N</span>
       </button>
 
       <div className="recent-chats-header">
@@ -91,11 +125,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="avatar">{userProfile.avatar}</div>
           <div className="user-details">
             <span className="user-name">{userProfile.name}</span>
-            <span className="user-plan">{userProfile.plan}</span>
           </div>
         </div>
-        <Settings size={18} className="recent-icon" />
+        <button className="icon-btn" onClick={onOpenAboutModal} title="About ATOM">
+          <Info size={18} className="recent-icon" />
+        </button>
       </div>
+
+      <div className="sidebar-resizer" onMouseDown={startResizing} />
     </aside>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Paperclip, Triangle, ChevronDown, Send } from 'lucide-react';
+import { Triangle, ChevronDown, Send } from 'lucide-react';
 import './ChatComposer.css';
 
 interface ChatComposerProps {
@@ -10,11 +10,6 @@ interface ChatComposerProps {
   onContextEnabledChange: (enabled: boolean) => void;
   isTyping?: boolean;
   onTextChange?: (text: string) => void;
-  suggestion?: {
-    text: string;
-    actionText: string;
-    onAction: () => void;
-  } | null;
 }
 
 export const ChatComposer: React.FC<ChatComposerProps> = ({ 
@@ -24,8 +19,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   contextEnabled,
   onContextEnabledChange,
   isTyping = false,
-  onTextChange,
-  suggestion
+  onTextChange
 }) => {
   const [input, setInput] = useState(initialValue);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -57,14 +51,6 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
 
   return (
     <div className="composer-container fade-in">
-      {suggestion && (
-        <div className="model-suggestion-banner fade-in">
-          <span className="suggestion-text">{suggestion.text}</span>
-          <button className="suggestion-action" onClick={suggestion.onAction}>
-            {suggestion.actionText}
-          </button>
-        </div>
-      )}
       <div className="composer-box">
         <textarea
           ref={textareaRef}
@@ -81,9 +67,6 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
         
         <div className="composer-actions">
           <div className="actions-left">
-            <button className="icon-btn-small">
-              <Paperclip size={18} />
-            </button>
             <button className="context-btn" onClick={onAddContextClick} disabled={isTyping}>
               <Triangle size={14} />
               <span>Add context</span>
@@ -97,18 +80,17 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             </button>
           </div>
         </div>
-      </div>
-
-      <div className="composer-footer">
-        <label className="checkbox-wrapper">
-          <input 
-            type="checkbox" 
-            checked={contextEnabled}
-            onChange={(e) => onContextEnabledChange(e.target.checked)}
-          />
-          <span>Use my engineering context (notes, subjects, etc.)</span>
-        </label>
-        <span className="hint-text">Press Enter to send</span>
+        <div className="composer-footer">
+          <label className="checkbox-wrapper">
+            <input 
+              type="checkbox" 
+              checked={contextEnabled}
+              onChange={(e) => onContextEnabledChange(e.target.checked)}
+            />
+            <span>Use my engineering context</span>
+          </label>
+          <span className="hint-text">Press Enter to send</span>
+        </div>
       </div>
     </div>
   );

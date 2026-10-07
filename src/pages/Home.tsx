@@ -7,8 +7,11 @@ import { FeatureCards } from '../components/FeatureCards';
 import { ChatComposer } from '../components/ChatComposer';
 import { ChatRenderer } from '../components/ChatRenderer';
 import { ContextManager } from '../components/ContextManager';
+import { DataPrivacyModal } from '../components/DataPrivacyModal';
+import { AboutModal } from '../components/AboutModal';
 import { sendChatMessage } from '../services/nvidiaService';
 import type { ChatMessage } from '../services/nvidiaService';
+import { fetchConversations, fetchMessages, createConversation, saveMessage, deleteAllConversations } from '../services/chatService';
 import { DEFAULT_MODEL_ID } from '../data/models';
 import './Home.css';
 
@@ -33,14 +36,16 @@ export const Home: React.FC = () => {
       document.body.classList.remove('dark-theme');
     }
   }, [isDarkTheme]);
-  
-  // Suggestion State
-  const [suggestion, setSuggestion] = useState<{ text: string; actionText: string; targetModel: string } | null>(null);
-
   // Context State
   const [isContextModalOpen, setIsContextModalOpen] = useState(false);
   const [engineeringContext, setEngineeringContext] = useState('');
   const [contextEnabled, setContextEnabled] = useState(true);
+  
+  // Privacy State
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  
+  // About State
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -51,6 +56,30 @@ export const Home: React.FC = () => {
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + N for New Chat
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        setMessages([]);
+        setActiveConversationId(null);
+        setComposerInitialValue('');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Fetch conversations on mount
+  useEffect(() => {
+    const loadConversations = async () => {
+      const data = await fetchConversations();
+      setConversations(data);
+    };
+    loadConversations();
   }, []);
 
   useEffect(() => {
@@ -69,76 +98,45 @@ export const Home: React.FC = () => {
     setComposerInitialValue('');
   };
 
-  const handleSelectConversation = (id: string) => {
-    // Phase 7: Fetch from Supabase
-    // For now, it just resets since it's mock state
+  const handleSelectConversation = async (id: string) => {
     const conv = conversations.find(c => c.id === id);
     if (conv && conv.model_id) {
       setSelectedModel(conv.model_id);
     }
     setActiveConversationId(id);
-    setMessages([]);
+    
+    // Fetch messages from Supabase
+    setMessages([]); // clear immediately for visual feedback
+    const chatHistory = await fetchMessages(id);
+    setMessages(chatHistory);
   };
 
-  const handleComposerTextChange = (text: string) => {
-    if (selectedModel === 'atom-auto') {
-      setSuggestion(null);
-      return;
-    }
-
-    const lower = text.toLowerCase();
-    
-    // Large context
-    if (text.length > 20000 || (lower.includes('entire syllabus') || lower.includes('massive document'))) {
-      if (selectedModel !== 'nvidia/nemotron-3-super-120b-a12b') {
-        setSuggestion({
-          text: "Large context detected — Nemotron 3 Super may be a better fit.",
-          actionText: "Use Nemotron 3 Super",
-          targetModel: "nvidia/nemotron-3-super-120b-a12b"
-        });
-        return;
-      }
-    }
-
-    // Advanced Reasoning
-    if (lower.includes('derive') || lower.includes('prove') || lower.includes('complex logic')) {
-      if (selectedModel !== 'nvidia/nemotron-3-ultra-550b-a55b') {
-        setSuggestion({
-          text: "Advanced reasoning model available.",
-          actionText: "Use Nemotron 3 Ultra",
-          targetModel: "nvidia/nemotron-3-ultra-550b-a55b"
-        });
-        return;
-      }
-    }
-    
-    // Coding
-    if (lower.includes('function') || lower.includes('def') || lower.includes('class ') || lower.includes('debug')) {
-      if (!selectedModel.includes('glm') && !selectedModel.includes('laguna') && !selectedModel.includes('lightning')) {
-        setSuggestion({
-          text: "Coding task detected. A specialized coding model may perform better.",
-          actionText: "Use GLM-5-3",
-          targetModel: "deepseek-ai/deepseek-coder-6.7b-instruct"
-        });
-        return;
-      }
-    }
-
-    setSuggestion(null);
+  const handleComposerTextChange = () => {
+    // Model suggestion logic removed as per user request
   };
 
   const handleSendMessage = async (text: string) => {
-    // Add user message
+    // Add user message locally
     const newUserMsg: ChatMessage = { role: 'user', content: text };
     const newMessages = [...messages, newUserMsg];
     setMessages(newMessages);
     setIsTyping(true);
     
+    let currentConvId = activeConversationId;
     // Create conversation record if first message
-    if (!activeConversationId) {
-      const newConvId = Date.now().toString();
-      setActiveConversationId(newConvId);
-      setConversations(prev => [{ id: newConvId, title: text.slice(0, 30) + '...', model_id: selectedModel }, ...prev]);
+    if (!currentConvId) {
+      const title = text.slice(0, 30) + '...';
+      const newConvId = await createConversation(title, selectedModel);
+      if (newConvId) {
+        currentConvId = newConvId;
+        setActiveConversationId(newConvId);
+        setConversations(prev => [{ id: newConvId, title, model_id: selectedModel }, ...prev]);
+      }
+    }
+
+    if (currentConvId) {
+      // Save user message to Supabase
+      saveMessage(currentConvId, 'user', text);
     }
 
     try {
@@ -151,10 +149,7 @@ export const Home: React.FC = () => {
         selectedModel,
         { text: engineeringContext, enabled: contextEnabled },
         (chunkInfo) => {
-          // If we receive the first chunk, ATOM is no longer just 'thinking'
           setIsTyping(false); 
-          
-          // Update the last message (the assistant one) with the accumulated chunks
           setMessages(prev => {
             const updated = [...prev];
             const lastMsg = updated[updated.length - 1];
@@ -169,10 +164,18 @@ export const Home: React.FC = () => {
           });
         }
       );
+      
+      // Save final AI response to Supabase
+      if (currentConvId) {
+        // Need to grab the final message state from the current messages array isn't easy 
+        // since state updates are asynchronous, but we can do it by using a state functional update trick,
+        // or just by having sendChatMessage return the full final text, but our sendChatMessage doesn't return it.
+        // We can just rely on a setTimeout or another effect, but the easiest way is to use a callback hook 
+        // or just wait a tick. Actually, we can just save it after the promise resolves by looking at the last message.
+      }
     } catch (error: any) {
       console.error(error);
       setMessages(prev => {
-        // If it failed, we replace the empty assistant message we created with an error
         const updated = [...prev];
         const lastMsg = updated[updated.length - 1];
         if (lastMsg && lastMsg.role === 'assistant' && lastMsg.content === '') {
@@ -183,7 +186,20 @@ export const Home: React.FC = () => {
       });
     } finally {
       setIsTyping(false);
-      setSuggestion(null); // Clear suggestion after sending
+      
+      // Save final AI response to Supabase after a short delay so React state is fully updated
+      if (currentConvId) {
+         setTimeout(() => {
+           setMessages(currentMessages => {
+              const last = currentMessages[currentMessages.length - 1];
+              if (last && last.role === 'assistant') {
+                 // Save to DB
+                 saveMessage(currentConvId!, last.role, last.content);
+              }
+              return currentMessages;
+           });
+         }, 500);
+      }
     }
   };
 
@@ -191,6 +207,10 @@ export const Home: React.FC = () => {
     // Phase 7: Save to Supabase
     setEngineeringContext(newContext);
     return Promise.resolve();
+  };
+
+  const handleClearData = async () => {
+    await deleteAllConversations();
   };
 
   const handleModelChange = (modelId: string) => {
@@ -204,6 +224,10 @@ export const Home: React.FC = () => {
     }
   };
 
+  const toggleTheme = () => {
+    setIsDarkTheme(prev => !prev);
+  };
+
   return (
     <div className="layout">
       <Sidebar 
@@ -212,6 +236,7 @@ export const Home: React.FC = () => {
         activeConversationId={activeConversationId}
         onNewChat={handleNewChat}
         onSelectConversation={handleSelectConversation}
+        onOpenAboutModal={() => setIsAboutModalOpen(true)}
       />
       
       <main className="main-content">
@@ -220,7 +245,10 @@ export const Home: React.FC = () => {
           selectedModel={selectedModel}
           onModelChange={handleModelChange}
           isDarkTheme={isDarkTheme}
-          toggleTheme={() => setIsDarkTheme(!isDarkTheme)}
+          toggleTheme={toggleTheme}
+          onOpenContextManager={() => setIsContextModalOpen(true)}
+          onOpenPrivacyModal={() => setIsPrivacyModalOpen(true)}
+          onOpenAboutModal={() => setIsAboutModalOpen(true)}
         />
         
         <div className="content-scrollable" ref={scrollRef}>
@@ -258,14 +286,6 @@ export const Home: React.FC = () => {
               onContextEnabledChange={setContextEnabled}
               isTyping={isTyping}
               onTextChange={handleComposerTextChange}
-              suggestion={suggestion ? {
-                text: suggestion.text,
-                actionText: suggestion.actionText,
-                onAction: () => {
-                  setSelectedModel(suggestion.targetModel);
-                  setSuggestion(null);
-                }
-              } : null}
             />
           </div>
         </div>
@@ -276,6 +296,17 @@ export const Home: React.FC = () => {
         onClose={() => setIsContextModalOpen(false)}
         initialContext={engineeringContext}
         onSave={handleSaveContext}
+      />
+      
+      <DataPrivacyModal 
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+        onClearData={handleClearData}
+      />
+
+      <AboutModal
+        isOpen={isAboutModalOpen}
+        onClose={() => setIsAboutModalOpen(false)}
       />
     </div>
   );
