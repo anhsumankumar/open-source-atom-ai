@@ -52,8 +52,12 @@
 .message-bubble-wrapper {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: 6px;
   position: relative;
+}
+
+.user-message .message-bubble-wrapper {
+  justify-content: flex-end;
 }
 
 .edit-btn {
@@ -61,7 +65,7 @@
   border: none;
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 6px;
+  padding: 4px;
   border-radius: 50%;
   transition: all 0.2s ease;
   opacity: 0.4;

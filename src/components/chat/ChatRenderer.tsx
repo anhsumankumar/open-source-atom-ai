@@ -89,14 +89,14 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({ content, isUser, rea
             </div>
           ) : (
             <div className="message-bubble-wrapper">
-              <div className="message-bubble">
-                {content}
+              <div className="message-bubble" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>{content}</span>
+                {onEdit && (
+                  <button className="edit-btn" onClick={() => setIsEditing(true)} title="Edit Message">
+                    <Edit2 size={12} />
+                  </button>
+                )}
               </div>
-              {onEdit && (
-                <button className="edit-btn" onClick={() => setIsEditing(true)} title="Edit Message">
-                  <Edit2 size={14} />
-                </button>
-              )}
             </div>
           )}
         </div>
