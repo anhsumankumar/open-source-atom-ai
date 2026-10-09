@@ -27,7 +27,8 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false); // Controls Stop button
+  const [isWaitingForFirstChunk, setIsWaitingForFirstChunk] = useState(false); // Controls 'ATOM is thinking...'
   const [composerInitialValue, setComposerInitialValue] = useState('');
   const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODEL_ID);
   
@@ -135,6 +136,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
     const newMessages = [...messages, newUserMsg];
     setMessages(newMessages);
     setIsTyping(true);
+    setIsWaitingForFirstChunk(true);
     shouldAutoScroll.current = true; // Force auto-scroll on new message
     
     let currentConvId = activeConversationId;
@@ -167,7 +169,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
         selectedModel,
         { text: engineeringContext, enabled: contextEnabled },
         (chunkInfo) => {
-          setIsTyping(false); 
+          setIsWaitingForFirstChunk(false); 
           setMessages(prev => {
             const updated = [...prev];
             const lastMsg = updated[updated.length - 1];
@@ -211,6 +213,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
     } finally {
       abortControllerRef.current = null;
       setIsTyping(false);
+      setIsWaitingForFirstChunk(false);
       
       // Save final AI response to Supabase after a short delay so React state is fully updated
       if (currentConvId) {
@@ -304,7 +307,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
               {messages.map((msg, idx) => (
                 <ChatRenderer key={idx} content={msg.content} isUser={msg.role === 'user'} reasoning={msg.reasoning} />
               ))}
-              {isTyping && (
+              {isWaitingForFirstChunk && (
                 <div className="message atom-message fade-in">
                   <div className="message-content handwriting-text" style={{ color: 'var(--text-secondary)', opacity: 0.7 }}>
                     ATOM is thinking...
