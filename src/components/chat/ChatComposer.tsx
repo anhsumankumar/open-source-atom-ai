@@ -1,6 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Triangle, ChevronDown, Send, Square } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Triangle, ChevronDown, Send, Square, Mic, MicOff } from 'lucide-react';
 import './ChatComposer.css';
+
+// Declare SpeechRecognition for TypeScript
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
 
 interface ChatComposerProps {
   onSend: (message: string) => void;
@@ -24,7 +32,54 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   onTextChange
 }) => {
   const [input, setInput] = useState(initialValue);
+  const [isListening, setIsListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    // Initialize Speech Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US'; // Can be made dynamic later
+
+      recognition.onresult = (event: any) => {
+        let currentTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            setInput(prev => prev + transcript + ' ');
+          } else {
+            currentTranscript += transcript;
+          }
+        }
+        // If we want to show interim results, we would need a separate state, 
+        // but appending final results is cleaner.
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+    } else {
+      recognitionRef.current?.start();
+      setIsListening(true);
+    }
+  };
 
   useEffect(() => {
     setInput(initialValue);
@@ -80,6 +135,16 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           </div>
           
           <div className="actions-right">
+            {recognitionRef.current && (
+              <button 
+                className={`icon-btn-small mic-btn ${isListening ? 'listening' : ''}`} 
+                onClick={toggleListening}
+                disabled={isTyping}
+                title="Voice Input"
+              >
+                {isListening ? <MicOff size={18} color="var(--primary-accent)" /> : <Mic size={18} />}
+              </button>
+            )}
             {isTyping ? (
               <button className="send-btn stop-btn" onClick={onStop}>
                 <Square size={14} fill="currentColor" />
