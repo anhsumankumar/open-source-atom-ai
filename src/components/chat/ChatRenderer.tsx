@@ -64,7 +64,7 @@ interface ChatRendererProps {
   onRegenerate?: () => void;
 }
 
-export const ChatRenderer: React.FC<ChatRendererProps> = ({ 
+export const ChatRenderer = React.memo<ChatRendererProps>(({ 
   content, 
   isUser, 
   reasoning, 
@@ -77,6 +77,7 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({
 }) => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [editValue, setEditValue] = React.useState(content);
+  const [isThinkingOpen, setIsThinkingOpen] = React.useState(false);
 
   const handleSaveEdit = () => {
     if (editValue.trim() && editValue !== content && onEdit) {
@@ -140,10 +141,14 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({
     <div className="message atom-message">
       <div className="message-content handwriting-text">
         {reasoning && (
-          <details className="thinking-block">
+          <details 
+            className="thinking-block" 
+            open={isThinkingOpen} 
+            onToggle={(e: any) => setIsThinkingOpen(e.currentTarget.open)}
+          >
             <summary className="thinking-summary">ATOM's Thought Process</summary>
             <div className="thinking-content">
-              <ReactMarkdown>{reasoning}</ReactMarkdown>
+              {isThinkingOpen && <ReactMarkdown>{reasoning}</ReactMarkdown>}
             </div>
           </details>
         )}
@@ -169,4 +174,10 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({
       </div>
     </div>
   );
-};
+}, (prev, next) => {
+  return prev.content === next.content &&
+         prev.reasoning === next.reasoning &&
+         prev.currentIndex === next.currentIndex &&
+         prev.siblingCount === next.siblingCount &&
+         prev.isUser === next.isUser;
+});
