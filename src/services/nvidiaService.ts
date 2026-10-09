@@ -156,6 +156,14 @@ export const sendChatMessage = async (
       }
     }
 
+    // Stream finished, append a visual indicator
+    if (fullResponse.trim().length > 0) {
+      fullResponse += "\n\n— ATOM ✨";
+      if (onChunk) {
+        onChunk({ content: fullResponse, reasoning: fullReasoning });
+      }
+    }
+
     return { content: fullResponse, reasoning: fullReasoning };
   } catch (error) {
     console.error('NVIDIA Service Error:', error);
