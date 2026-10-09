@@ -155,6 +155,7 @@ export const sendChatMessage = async (
             // ignore partial JSON parse errors
           }
         }
+      }
     }
 
     return { content: fullResponse, reasoning: fullReasoning };
