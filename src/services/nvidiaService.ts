@@ -69,7 +69,7 @@ export const determineAutoModel = (messages: ChatMessage[], contextText: string)
 export const sendChatMessage = async (
   messages: ChatMessage[], 
   modelId: string,
-  engineeringContext: { text: string; enabled: boolean },
+  engineeringContext: { text: string; enabled: boolean; deepThinking?: boolean },
   onChunk?: (chunkInfo: { content: string, reasoning: string }) => void,
   signal?: AbortSignal
 ): Promise<{ content: string, reasoning: string }> => {
@@ -78,9 +78,15 @@ export const sendChatMessage = async (
   const payloadMessages: ChatMessage[] = [];
   
   // Base system prompt
+  let finalSystemPrompt = atomEngineeringSystemPrompt;
+  
+  if (engineeringContext.deepThinking) {
+    finalSystemPrompt += `\n\n[DEEP THINKING MODE ENABLED]\nCRITICAL INSTRUCTION: You are in Deep Thinking Mode. You must exhaustively analyze the problem. Think step-by-step in extreme detail. Generate maximum context, explore edge cases, provide mathematical proofs or deep architectural breakdowns if applicable, and leave no stone unturned. Your output should be comprehensive and jaw-droppingly detailed. Do not abbreviate or summarize; expand on everything.`;
+  }
+  
   payloadMessages.push({
     role: 'system',
-    content: atomEngineeringSystemPrompt
+    content: finalSystemPrompt
   });
   
   // Optional Engineering Context

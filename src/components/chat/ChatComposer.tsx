@@ -17,6 +17,8 @@ interface ChatComposerProps {
   onAddContextClick: () => void;
   contextEnabled: boolean;
   onContextEnabledChange: (enabled: boolean) => void;
+  deepThinkingEnabled: boolean;
+  onDeepThinkingChange: (enabled: boolean) => void;
   isTyping?: boolean;
   onTextChange?: (text: string) => void;
 }
@@ -27,6 +29,8 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   onAddContextClick,
   contextEnabled,
   onContextEnabledChange,
+  deepThinkingEnabled,
+  onDeepThinkingChange,
   isTyping = false,
   onStop,
   onTextChange
@@ -126,6 +130,19 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
               <Triangle size={14} />
               <span>Add context</span>
               <ChevronDown size={14} />
+            </button>
+            <button 
+              className={`context-btn ${deepThinkingEnabled ? 'active-think' : ''}`} 
+              onClick={() => onDeepThinkingChange(!deepThinkingEnabled)} 
+              disabled={isTyping}
+              style={{
+                marginLeft: '8px',
+                backgroundColor: deepThinkingEnabled ? 'var(--primary-accent)' : 'transparent',
+                color: deepThinkingEnabled ? '#000' : 'var(--text-secondary)'
+              }}
+            >
+              <span style={{ fontSize: '14px' }}>🧠</span>
+              <span style={{ fontWeight: deepThinkingEnabled ? 600 : 500 }}>Deep Think</span>
             </button>
           </div>
           

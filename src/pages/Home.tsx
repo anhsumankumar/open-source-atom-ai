@@ -60,6 +60,9 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
   const [engineeringContext, setEngineeringContext] = useState('');
   const [contextEnabled, setContextEnabled] = useState(true);
   
+  // AI Settings State
+  const [deepThinkingEnabled, setDeepThinkingEnabled] = useState(false);
+  
   // Privacy State
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   
@@ -167,7 +170,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
       const finalResult = await sendChatMessage(
         baseMessages, 
         selectedModel,
-        { text: engineeringContext, enabled: contextEnabled },
+        { text: engineeringContext, enabled: contextEnabled, deepThinking: deepThinkingEnabled },
         (chunkInfo) => {
           setIsWaitingForFirstChunk(false); 
           setAllMessages(prev => prev.map(m => {
@@ -426,6 +429,8 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
               onAddContextClick={() => setIsContextModalOpen(true)}
               contextEnabled={contextEnabled}
               onContextEnabledChange={setContextEnabled}
+              deepThinkingEnabled={deepThinkingEnabled}
+              onDeepThinkingChange={setDeepThinkingEnabled}
               isTyping={isTyping}
               onTextChange={handleComposerTextChange}
             />
