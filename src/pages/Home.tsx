@@ -164,7 +164,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
 
-      await sendChatMessage(
+      const finalResult = await sendChatMessage(
         newMessages, 
         selectedModel,
         { text: engineeringContext, enabled: contextEnabled },
@@ -174,9 +174,11 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
             const updated = [...prev];
             const lastMsg = updated[updated.length - 1];
             if (lastMsg && lastMsg.role === 'assistant') {
+              // Hide the memory tags from the UI while streaming
+              const cleanContent = chunkInfo.content.replace(/<UPDATE_MEMORY>[\s\S]*?(?:<\/UPDATE_MEMORY>|$)/g, '');
               updated[updated.length - 1] = { 
                 ...lastMsg, 
-                content: chunkInfo.content, 
+                content: cleanContent, 
                 reasoning: chunkInfo.reasoning 
               };
             }
@@ -186,13 +188,16 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
         abortController.signal
       );
       
-      // Save final AI response to Supabase
-      if (currentConvId) {
-        // Need to grab the final message state from the current messages array isn't easy 
-        // since state updates are asynchronous, but we can do it by using a state functional update trick,
-        // or just by having sendChatMessage return the full final text, but our sendChatMessage doesn't return it.
-        // We can just rely on a setTimeout or another effect, but the easiest way is to use a callback hook 
-        // or just wait a tick. Actually, we can just save it after the promise resolves by looking at the last message.
+      // Process autonomous memory
+      const memoryMatches = finalResult.content.match(/<UPDATE_MEMORY>([\s\S]*?)<\/UPDATE_MEMORY>/g);
+      if (memoryMatches) {
+        const newFacts = memoryMatches.map(m => m.replace(/<\/?UPDATE_MEMORY>/g, '').trim()).join('\n');
+        if (newFacts) {
+          const updatedContext = engineeringContext 
+            ? `${engineeringContext}\n\n[Added by ATOM]\n${newFacts}`
+            : `[Added by ATOM]\n${newFacts}`;
+          handleSaveContext(updatedContext);
+        }
       }
     } catch (error: any) {
       if (error.name === 'AbortError') {
@@ -253,10 +258,19 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
   };
 
   const handleSaveContext = async (newContext: string) => {
-    // Phase 7: Save to Supabase
+    // Phase 7: Save to Supabase (also save to localStorage for immediate persist)
     setEngineeringContext(newContext);
+    localStorage.setItem('atom_engineering_context', newContext);
     return Promise.resolve();
   };
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('atom_engineering_context');
+    if (saved) {
+      setEngineeringContext(saved);
+    }
+  }, []);
 
   const handleClearData = async () => {
     await deleteAllConversations();
