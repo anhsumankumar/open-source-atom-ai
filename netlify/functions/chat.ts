@@ -55,7 +55,7 @@ export default async (req: Request, context: Context) => {
       model: resolvedModel,
       messages: messages,
       temperature: 0.2,
-      max_tokens: 1024,
+      max_tokens: 8192,
       stream: true,
     };
 
