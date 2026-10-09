@@ -135,6 +135,8 @@ body.dark-theme .code-block-header {
   background-color: #FFFFFF;
   overflow-x: auto;
   font-size: 14px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 body.dark-theme .code-block {
