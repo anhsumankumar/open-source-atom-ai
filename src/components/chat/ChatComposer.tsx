@@ -42,21 +42,16 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'en-US'; // Can be made dynamic later
+      recognition.interimResults = false; // More stable on desktop/mobile
+      recognition.lang = 'hi-IN'; // Fallback to English later if needed, but Hindi/English mixed works best with hi-IN or en-IN
 
       recognition.onresult = (event: any) => {
-        let currentTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
+            const transcript = event.results[i][0].transcript;
             setInput(prev => prev + transcript + ' ');
-          } else {
-            currentTranscript += transcript;
           }
         }
-        // If we want to show interim results, we would need a separate state, 
-        // but appending final results is cleaner.
       };
 
       recognition.onerror = (event: any) => {

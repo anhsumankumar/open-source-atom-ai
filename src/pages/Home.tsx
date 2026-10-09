@@ -130,10 +130,10 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
     // Model suggestion logic removed as per user request
   };
 
-  const handleSendMessage = async (text: string) => {
+  const handleSendMessage = async (text: string, baseMessages: ChatMessage[] = messages) => {
     // Add user message locally
     const newUserMsg: ChatMessage = { role: 'user', content: text };
-    const newMessages = [...messages, newUserMsg];
+    const newMessages = [...baseMessages, newUserMsg];
     setMessages(newMessages);
     setIsTyping(true);
     setIsWaitingForFirstChunk(true);
@@ -237,6 +237,21 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
     }
   };
 
+  const handleEditMessage = (index: number, newContent: string) => {
+    const previousMessages = messages.slice(0, index);
+    handleSendMessage(newContent, previousMessages);
+  };
+
+  const handleRegenerateMessage = (index: number) => {
+    const previousMessages = messages.slice(0, index);
+    const lastUserMsg = previousMessages[previousMessages.length - 1];
+    
+    if (lastUserMsg && lastUserMsg.role === 'user') {
+      const msgsWithoutLast = previousMessages.slice(0, -1);
+      handleSendMessage(lastUserMsg.content, msgsWithoutLast);
+    }
+  };
+
   const handleSaveContext = async (newContext: string) => {
     // Phase 7: Save to Supabase
     setEngineeringContext(newContext);
@@ -305,7 +320,14 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
           ) : (
             <div className="chat-state fade-in">
               {messages.map((msg, idx) => (
-                <ChatRenderer key={idx} content={msg.content} isUser={msg.role === 'user'} reasoning={msg.reasoning} />
+                <ChatRenderer 
+                  key={idx} 
+                  content={msg.content} 
+                  isUser={msg.role === 'user'} 
+                  reasoning={msg.reasoning} 
+                  onEdit={msg.role === 'user' ? (newContent) => handleEditMessage(idx, newContent) : undefined}
+                  onRegenerate={msg.role === 'assistant' && !isTyping ? () => handleRegenerateMessage(idx) : undefined}
+                />
               ))}
               {isWaitingForFirstChunk && (
                 <div className="message atom-message fade-in">

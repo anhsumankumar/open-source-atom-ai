@@ -5,7 +5,7 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, Edit2, RotateCw, X } from 'lucide-react';
 import './ChatRenderer.css';
 
 const CodeBlock = ({ node, inline, className, children, ...props }: any) => {
@@ -55,16 +55,50 @@ interface ChatRendererProps {
   content: string;
   isUser: boolean;
   reasoning?: string;
+  onEdit?: (newContent: string) => void;
+  onRegenerate?: () => void;
 }
 
-export const ChatRenderer: React.FC<ChatRendererProps> = ({ content, isUser, reasoning }) => {
+export const ChatRenderer: React.FC<ChatRendererProps> = ({ content, isUser, reasoning, onEdit, onRegenerate }) => {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editValue, setEditValue] = React.useState(content);
+
+  const handleSaveEdit = () => {
+    if (editValue.trim() && editValue !== content && onEdit) {
+      onEdit(editValue);
+    }
+    setIsEditing(false);
+  };
+
   if (isUser) {
     return (
-      <div className="message user-message">
+      <div className="message user-message group">
         <div className="message-content handwriting-text">
-          <div className="message-bubble">
-            {content}
-          </div>
+          {isEditing ? (
+            <div className="message-edit-container">
+              <textarea 
+                className="message-edit-input"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                autoFocus
+              />
+              <div className="message-edit-actions">
+                <button className="btn-cancel" onClick={() => setIsEditing(false)}>Cancel</button>
+                <button className="btn-save" onClick={handleSaveEdit}>Save & Send</button>
+              </div>
+            </div>
+          ) : (
+            <div className="message-bubble-wrapper">
+              <div className="message-bubble">
+                {content}
+              </div>
+              {onEdit && (
+                <button className="edit-btn" onClick={() => setIsEditing(true)} title="Edit Message">
+                  <Edit2 size={14} />
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -93,6 +127,14 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({ content, isUser, rea
         >
           {content}
         </ReactMarkdown>
+        {onRegenerate && (
+          <div className="message-footer">
+            <button className="regenerate-btn" onClick={onRegenerate} title="Regenerate Response">
+              <RotateCw size={14} />
+              <span>Regenerate</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
