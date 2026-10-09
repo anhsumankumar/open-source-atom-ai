@@ -17,10 +17,15 @@ export const fetchConversations = async (): Promise<Conversation[]> => {
   return data as Conversation[];
 };
 
-export const fetchMessages = async (conversationId: string): Promise<ChatMessage[]> => {
+export interface DBMessage extends ChatMessage {
+  id: string;
+  parent_id: string | null;
+}
+
+export const fetchMessages = async (conversationId: string): Promise<DBMessage[]> => {
   const { data, error } = await supabase
     .from('messages')
-    .select('role, content')
+    .select('id, parent_id, role, content')
     .eq('conversation_id', conversationId)
     .order('created_at', { ascending: true });
 
@@ -28,7 +33,7 @@ export const fetchMessages = async (conversationId: string): Promise<ChatMessage
     console.error('Error fetching messages:', error);
     return [];
   }
-  return data as ChatMessage[];
+  return data as DBMessage[];
 };
 
 export const createConversation = async (title: string, modelId: string): Promise<string | null> => {
@@ -46,20 +51,32 @@ export const createConversation = async (title: string, modelId: string): Promis
   return data.id;
 };
 
-export const saveMessage = async (conversationId: string, role: string, content: string) => {
+export const saveMessage = async (
+  conversationId: string, 
+  role: string, 
+  content: string,
+  parentId: string | null = null,
+  messageId: string
+): Promise<DBMessage | null> => {
   const userId = await getCurrentUserId();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('messages')
     .insert([{ 
+      id: messageId,
       conversation_id: conversationId, 
       user_id: userId, 
       role, 
-      content 
-    }]);
+      content,
+      parent_id: parentId
+    }])
+    .select('id, parent_id, role, content')
+    .single();
 
   if (error) {
     console.error('Error saving message:', error);
+    return null;
   }
+  return data as DBMessage;
 };
 
 export const overwriteConversationMessages = async (conversationId: string, messages: ChatMessage[]) => {

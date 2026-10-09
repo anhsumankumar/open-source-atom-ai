@@ -11,8 +11,8 @@ import { ContextManager } from '../components/modals/ContextManager';
 import { DataPrivacyModal } from '../components/modals/DataPrivacyModal';
 import { AboutModal } from '../components/modals/AboutModal';
 import { sendChatMessage } from '../services/nvidiaService';
-import { fetchConversations, fetchMessages, createConversation, saveMessage, deleteAllConversations, DBMessage } from '../services/chatService';
 import type { ChatMessage } from '../services/nvidiaService';
+import { fetchConversations, fetchMessages, createConversation, saveMessage, deleteAllConversations, overwriteConversationMessages } from '../services/chatService';
 import { DEFAULT_MODEL_ID } from '../data/models';
 import './Home.css';
 
@@ -26,19 +26,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
   // Chat State
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  const [allMessages, setAllMessages] = useState<DBMessage[]>([]);
-  const [activeLeafId, setActiveLeafId] = useState<string | null>(null);
-  
-  const messages = React.useMemo(() => {
-    const branch: DBMessage[] = [];
-    let curr = allMessages.find(m => m.id === activeLeafId);
-    while (curr) {
-      branch.unshift(curr);
-      curr = allMessages.find(m => m.id === curr.parent_id);
-    }
-    return branch;
-  }, [allMessages, activeLeafId]);
-
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false); // Controls Stop button
   const [isWaitingForFirstChunk, setIsWaitingForFirstChunk] = useState(false); // Controls 'ATOM is thinking...'
   const [composerInitialValue, setComposerInitialValue] = useState('');
@@ -121,8 +109,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
   };
 
   const handleNewChat = () => {
-    setAllMessages([]);
-    setActiveLeafId(null);
+    setMessages([]);
     setActiveConversationId(null);
     setComposerInitialValue('');
   };
@@ -135,51 +122,74 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
     setActiveConversationId(id);
     
     // Fetch messages from Supabase
-    setAllMessages([]); // clear immediately for visual feedback
-    setActiveLeafId(null);
+    setMessages([]); // clear immediately for visual feedback
     const chatHistory = await fetchMessages(id);
-    setAllMessages(chatHistory);
-    if (chatHistory.length > 0) {
-      setActiveLeafId(chatHistory[chatHistory.length - 1].id);
-    }
+    setMessages(chatHistory);
   };
 
   const handleComposerTextChange = () => {
     // Model suggestion logic removed as per user request
   };
 
-  const generateAiResponse = async (currentConvId: string, userMsgId: string, baseMessages: ChatMessage[]) => {
-    const aiMsgId = crypto.randomUUID();
-    const emptyAiMsg: DBMessage = { id: aiMsgId, parent_id: userMsgId, role: 'assistant', content: '' };
-    
-    setAllMessages(prev => [...prev, emptyAiMsg]);
-    setActiveLeafId(aiMsgId);
-    
+  const handleSendMessage = async (text: string, baseMessages: ChatMessage[] = messages) => {
+    // Add user message locally
+    const newUserMsg: ChatMessage = { role: 'user', content: text };
+    const newMessages = [...baseMessages, newUserMsg];
+    setMessages(newMessages);
     setIsTyping(true);
     setIsWaitingForFirstChunk(true);
-    shouldAutoScroll.current = true;
+    shouldAutoScroll.current = true; // Force auto-scroll on new message
     
-    const abortController = new AbortController();
-    abortControllerRef.current = abortController;
+    let currentConvId = activeConversationId;
+    // Create conversation record if first message
+    if (!currentConvId) {
+      const title = text.slice(0, 30) + '...';
+      const newConvId = await createConversation(title, selectedModel);
+      if (newConvId) {
+        currentConvId = newConvId;
+        setActiveConversationId(newConvId);
+        setConversations(prev => [{ id: newConvId, title, model_id: selectedModel }, ...prev]);
+      }
+    }
+
+    if (currentConvId) {
+      // Save user message to Supabase
+      saveMessage(currentConvId, 'user', text);
+    }
 
     try {
+      // Append an empty assistant message first to start streaming into it
+      const emptyAiMsg: ChatMessage = { role: 'assistant', content: '' };
+      setMessages(prev => [...prev, emptyAiMsg]);
+
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+
       const finalResult = await sendChatMessage(
-        baseMessages, 
+        newMessages, 
         selectedModel,
         { text: engineeringContext, enabled: contextEnabled },
         (chunkInfo) => {
           setIsWaitingForFirstChunk(false); 
-          setAllMessages(prev => prev.map(m => {
-            if (m.id === aiMsgId) {
+          setMessages(prev => {
+            const updated = [...prev];
+            const lastMsg = updated[updated.length - 1];
+            if (lastMsg && lastMsg.role === 'assistant') {
+              // Hide the memory tags from the UI while streaming
               const cleanContent = chunkInfo.content.replace(/<UPDATE_MEMORY>[\s\S]*?(?:<\/UPDATE_MEMORY>|$)/g, '');
-              return { ...m, content: cleanContent, reasoning: chunkInfo.reasoning };
+              updated[updated.length - 1] = { 
+                ...lastMsg, 
+                content: cleanContent, 
+                reasoning: chunkInfo.reasoning 
+              };
             }
-            return m;
-          }));
+            return updated;
+          });
         },
         abortController.signal
       );
       
+      // Process autonomous memory
       let cleanResponse = finalResult.content;
       const memoryMatches = finalResult.content.match(/<UPDATE_MEMORY>([\s\S]*?)<\/UPDATE_MEMORY>/g);
       
@@ -194,53 +204,32 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
         }
       }
       
+      // Save final AI response to Supabase EXACTLY ONCE
       if (currentConvId) {
-        saveMessage(currentConvId, 'assistant', cleanResponse, userMsgId, aiMsgId);
+        saveMessage(currentConvId, 'assistant', cleanResponse);
       }
+      
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.log('User stopped the generation.');
-        return;
+        return; // Exit early, the partial message is already in state
       }
+      
       console.error(error);
-      setAllMessages(prev => prev.map(m => {
-        if (m.id === aiMsgId && m.content === '') {
-          return { ...m, content: `**Error**: ${error.message}` };
+      setMessages(prev => {
+        const updated = [...prev];
+        const lastMsg = updated[updated.length - 1];
+        if (lastMsg && lastMsg.role === 'assistant' && lastMsg.content === '') {
+           updated[updated.length - 1] = { role: 'assistant', content: `**Error**: ${error.message}` };
+           return updated;
         }
-        return m;
-      }));
+        return [...prev, { role: 'assistant', content: `**Error**: ${error.message}` }];
+      });
     } finally {
       abortControllerRef.current = null;
       setIsTyping(false);
       setIsWaitingForFirstChunk(false);
     }
-  };
-
-  const handleSendMessage = async (text: string, parentId: string | null = activeLeafId) => {
-    const userMsgId = crypto.randomUUID();
-    const newUserMsg: DBMessage = { id: userMsgId, parent_id: parentId, role: 'user', content: text };
-    
-    setAllMessages(prev => [...prev, newUserMsg]);
-    setActiveLeafId(userMsgId);
-    shouldAutoScroll.current = true;
-    
-    let currentConvId = activeConversationId;
-    if (!currentConvId) {
-      const title = text.slice(0, 30) + '...';
-      const newConvId = await createConversation(title, selectedModel);
-      if (newConvId) {
-        currentConvId = newConvId;
-        setActiveConversationId(newConvId);
-        setConversations(prev => [{ id: newConvId, title, model_id: selectedModel }, ...prev]);
-      }
-    }
-
-    if (currentConvId) {
-      saveMessage(currentConvId, 'user', text, parentId, userMsgId);
-    }
-
-    const messagesForApi = [...messages, newUserMsg];
-    await generateAiResponse(currentConvId!, userMsgId, messagesForApi);
   };
 
   const handleStopMessage = () => {
@@ -249,24 +238,23 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
     }
   };
 
-  const handleEditMessage = async (msgId: string, newContent: string) => {
-    const msg = allMessages.find(m => m.id === msgId);
-    if (msg) {
-      handleSendMessage(newContent, msg.parent_id);
+  const handleEditMessage = async (index: number, newContent: string) => {
+    const previousMessages = messages.slice(0, index);
+    if (activeConversationId) {
+      await overwriteConversationMessages(activeConversationId, previousMessages);
     }
+    handleSendMessage(newContent, previousMessages);
   };
 
-  const handleRegenerateMessage = async (msgId: string) => {
-    const msg = allMessages.find(m => m.id === msgId);
-    if (msg && msg.role === 'user' && activeConversationId) {
-      // Find the message path up to this user message
-      const branch: DBMessage[] = [];
-      let curr: DBMessage | undefined = msg;
-      while (curr) {
-        branch.unshift(curr);
-        curr = allMessages.find(m => m.id === curr?.parent_id);
+  const handleRegenerateMessage = async (index: number) => {
+    const userMsg = messages[index];
+    
+    if (userMsg && userMsg.role === 'user') {
+      const previousMessages = messages.slice(0, index);
+      if (activeConversationId) {
+        await overwriteConversationMessages(activeConversationId, previousMessages);
       }
-      await generateAiResponse(activeConversationId, msg.id, branch);
+      handleSendMessage(userMsg.content, previousMessages);
     }
   };
 
@@ -346,62 +334,16 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
             </div>
           ) : (
             <div className="chat-state fade-in">
-              {messages.map((msg) => {
-                const siblings = allMessages.filter(m => m.parent_id === msg.parent_id);
-                const currentIndex = siblings.findIndex(m => m.id === msg.id);
-                
-                const handleNextBranch = () => {
-                  if (currentIndex < siblings.length - 1) {
-                    const nextSiblingId = siblings[currentIndex + 1].id;
-                    // Find the deepest leaf in this new branch
-                    let deepestLeaf = nextSiblingId;
-                    let currentSearch = nextSiblingId;
-                    while (true) {
-                      const child = allMessages.find(m => m.parent_id === currentSearch);
-                      if (child) {
-                        currentSearch = child.id;
-                        deepestLeaf = child.id;
-                      } else {
-                        break;
-                      }
-                    }
-                    setActiveLeafId(deepestLeaf);
-                  }
-                };
-
-                const handlePrevBranch = () => {
-                  if (currentIndex > 0) {
-                    const prevSiblingId = siblings[currentIndex - 1].id;
-                    let deepestLeaf = prevSiblingId;
-                    let currentSearch = prevSiblingId;
-                    while (true) {
-                      const child = allMessages.find(m => m.parent_id === currentSearch);
-                      if (child) {
-                        currentSearch = child.id;
-                        deepestLeaf = child.id;
-                      } else {
-                        break;
-                      }
-                    }
-                    setActiveLeafId(deepestLeaf);
-                  }
-                };
-
-                return (
-                  <ChatRenderer 
-                    key={msg.id} 
-                    content={msg.content} 
-                    isUser={msg.role === 'user'} 
-                    reasoning={msg.reasoning}
-                    siblingCount={siblings.length}
-                    currentIndex={currentIndex}
-                    onNextBranch={handleNextBranch}
-                    onPrevBranch={handlePrevBranch}
-                    onEdit={msg.role === 'user' ? (newContent) => handleEditMessage(msg.id, newContent) : undefined}
-                    onRegenerate={msg.role === 'user' && !isTyping ? () => handleRegenerateMessage(msg.id) : undefined}
-                  />
-                );
-              })}
+              {messages.map((msg, idx) => (
+                <ChatRenderer 
+                  key={idx} 
+                  content={msg.content} 
+                  isUser={msg.role === 'user'} 
+                  reasoning={msg.reasoning} 
+                  onEdit={msg.role === 'user' ? (newContent) => handleEditMessage(idx, newContent) : undefined}
+                  onRegenerate={msg.role === 'user' && !isTyping ? () => handleRegenerateMessage(idx) : undefined}
+                />
+              ))}
               {isWaitingForFirstChunk && (
                 <div className="message atom-message fade-in">
                   <div className="message-content handwriting-text" style={{ color: 'var(--text-secondary)', opacity: 0.7 }}>

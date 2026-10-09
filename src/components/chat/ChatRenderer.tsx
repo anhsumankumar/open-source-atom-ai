@@ -55,11 +55,25 @@ interface ChatRendererProps {
   content: string;
   isUser: boolean;
   reasoning?: string;
+  siblingCount?: number;
+  currentIndex?: number;
+  onNextBranch?: () => void;
+  onPrevBranch?: () => void;
   onEdit?: (newContent: string) => void;
   onRegenerate?: () => void;
 }
 
-export const ChatRenderer: React.FC<ChatRendererProps> = ({ content, isUser, reasoning, onEdit, onRegenerate }) => {
+export const ChatRenderer: React.FC<ChatRendererProps> = ({ 
+  content, 
+  isUser, 
+  reasoning, 
+  siblingCount = 1,
+  currentIndex = 0,
+  onNextBranch,
+  onPrevBranch,
+  onEdit, 
+  onRegenerate 
+}) => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [editValue, setEditValue] = React.useState(content);
 
@@ -98,12 +112,21 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({ content, isUser, rea
                     </button>
                   )}
                 </div>
-                {onRegenerate && (
-                  <button className="regenerate-btn" onClick={onRegenerate} title="Regenerate Response">
-                    <RotateCw size={12} />
-                    <span>Regenerate</span>
-                  </button>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  {siblingCount > 1 && (
+                    <div className="branch-controls">
+                      <button className="branch-btn" onClick={onPrevBranch} disabled={currentIndex === 0}>{'<'}</button>
+                      <span className="branch-text">{currentIndex + 1} / {siblingCount}</span>
+                      <button className="branch-btn" onClick={onNextBranch} disabled={currentIndex === siblingCount - 1}>{'>'}</button>
+                    </div>
+                  )}
+                  {onRegenerate && (
+                    <button className="regenerate-btn" onClick={onRegenerate} title="Regenerate Response">
+                      <RotateCw size={12} />
+                      <span>Regenerate</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -135,6 +158,13 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({ content, isUser, rea
         >
           {content}
         </ReactMarkdown>
+        {!isUser && siblingCount > 1 && (
+          <div className="branch-controls atom-branch">
+            <button onClick={onPrevBranch} disabled={currentIndex === 0}>{'<'}</button>
+            <span>{currentIndex + 1} / {siblingCount}</span>
+            <button onClick={onNextBranch} disabled={currentIndex === siblingCount - 1}>{'>'}</button>
+          </div>
+        )}
       </div>
     </div>
   );
