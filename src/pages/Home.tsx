@@ -204,7 +204,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
           currentMessagesForApi = [
              ...currentMessagesForApi,
              { role: 'assistant', content: finalResult.content },
-             { role: 'user', content: 'Continue generating exactly where you left off. Do not repeat anything from before. Start your response immediately with the continuation, without any conversational filler or introductions.' }
+             { role: 'user', content: 'Your previous response was cut off because it reached the maximum length limit. Please provide ONLY the remaining part of your response. Start exactly from the very next word/character where you left off. DO NOT repeat any of the code or text you have already written above.' }
           ];
         } else {
           isFinished = true;

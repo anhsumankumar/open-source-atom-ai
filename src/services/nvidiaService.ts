@@ -132,6 +132,9 @@ export const sendChatMessage = async (
     let fullReasoning = '';
     let buffer = '';
     let finishReason = '';
+    
+    let lastUpdateTime = 0;
+    const THROTTLE_MS = 50; // Update UI at most every 50ms
 
     while (true) {
       const { done, value } = await reader.read();
@@ -160,8 +163,13 @@ export const sendChatMessage = async (
                 if (deltaContent || reasoningContent) {
                   fullResponse += deltaContent;
                   fullReasoning += reasoningContent;
+                  
                   if (onChunk) {
-                    onChunk({ content: fullResponse, reasoning: fullReasoning });
+                    const now = Date.now();
+                    if (now - lastUpdateTime > THROTTLE_MS) {
+                      onChunk({ content: fullResponse, reasoning: fullReasoning });
+                      lastUpdateTime = now;
+                    }
                   }
                 }
               }
@@ -171,6 +179,11 @@ export const sendChatMessage = async (
           }
         }
       }
+    }
+
+    // Ensure final chunk is always sent
+    if (onChunk) {
+      onChunk({ content: fullResponse, reasoning: fullReasoning });
     }
 
     return { content: fullResponse, reasoning: fullReasoning, finishReason };
