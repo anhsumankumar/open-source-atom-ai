@@ -167,55 +167,28 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
     abortControllerRef.current = abortController;
 
     try {
-      let isFinished = false;
-      let currentMessagesForApi = [...baseMessages];
-      let cumulativeResponse = '';
-      let cumulativeReasoning = '';
-      let continuationCount = 0;
-      let finalCleanResponse = '';
-      const MAX_CONTINUATIONS = 3;
+      const finalResult = await sendChatMessage(
+        baseMessages, 
+        selectedModel,
+        { text: engineeringContext, enabled: contextEnabled, deepThinking: deepThinkingEnabled },
+        (chunkInfo) => {
+          setIsWaitingForFirstChunk(false); 
+          setAllMessages(prev => prev.map(m => {
+            if (m.id === aiMsgId) {
+              const cleanContent = chunkInfo.content.replace(/<UPDATE_MEMORY>[\s\S]*?(?:<\/UPDATE_MEMORY>|$)/g, '');
+              return { ...m, content: cleanContent, reasoning: chunkInfo.reasoning };
+            }
+            return m;
+          }));
+        },
+        abortControllerRef.current?.signal
+      );
       
-      while (!isFinished && !abortControllerRef.current?.signal.aborted && continuationCount <= MAX_CONTINUATIONS) {
-        const finalResult = await sendChatMessage(
-          currentMessagesForApi, 
-          selectedModel,
-          { text: engineeringContext, enabled: contextEnabled, deepThinking: deepThinkingEnabled },
-          (chunkInfo) => {
-            setIsWaitingForFirstChunk(false); 
-            setAllMessages(prev => prev.map(m => {
-              if (m.id === aiMsgId) {
-                const totalContent = cumulativeResponse + chunkInfo.content;
-                const totalReasoning = cumulativeReasoning + chunkInfo.reasoning;
-                const cleanContent = totalContent.replace(/<UPDATE_MEMORY>[\s\S]*?(?:<\/UPDATE_MEMORY>|$)/g, '');
-                return { ...m, content: cleanContent, reasoning: totalReasoning };
-              }
-              return m;
-            }));
-          },
-          abortControllerRef.current.signal
-        );
-        
-        cumulativeResponse += finalResult.content;
-        cumulativeReasoning += finalResult.reasoning;
-        
-        if (finalResult.finishReason === 'length') {
-          continuationCount++;
-          // Prepare for the next loop
-          currentMessagesForApi = [
-             ...currentMessagesForApi,
-             { role: 'assistant', content: finalResult.content },
-             { role: 'user', content: 'Your previous response was cut off because it reached the maximum length limit. Please provide ONLY the remaining part of your response. Start exactly from the very next word/character where you left off. DO NOT repeat any of the code or text you have already written above.' }
-          ];
-        } else {
-          isFinished = true;
-        }
-      }
-      
-      let cleanResponse = cumulativeResponse;
-      const memoryMatches = cumulativeResponse.match(/<UPDATE_MEMORY>([\s\S]*?)<\/UPDATE_MEMORY>/g);
+      let cleanResponse = finalResult.content;
+      const memoryMatches = finalResult.content.match(/<UPDATE_MEMORY>([\s\S]*?)<\/UPDATE_MEMORY>/g);
       
       if (memoryMatches) {
-        cleanResponse = cumulativeResponse.replace(/<UPDATE_MEMORY>[\s\S]*?(?:<\/UPDATE_MEMORY>|$)/g, '').trim();
+        cleanResponse = finalResult.content.replace(/<UPDATE_MEMORY>[\s\S]*?(?:<\/UPDATE_MEMORY>|$)/g, '').trim();
         const newFacts = memoryMatches.map(m => m.replace(/<\/?UPDATE_MEMORY>/g, '').trim()).join('\n');
         if (newFacts) {
           const updatedContext = engineeringContext 

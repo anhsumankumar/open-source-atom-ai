@@ -134,7 +134,7 @@ export const sendChatMessage = async (
     let finishReason = '';
     
     let lastUpdateTime = 0;
-    const THROTTLE_MS = 50; // Update UI at most every 50ms
+    const THROTTLE_MS = 250; // Update UI at most every 250ms (4 FPS)
 
     while (true) {
       const { done, value } = await reader.read();
