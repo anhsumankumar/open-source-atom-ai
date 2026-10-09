@@ -60,7 +60,8 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
   const handleScroll = () => {
     if (!scrollRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    const isNearBottom = scrollHeight - scrollTop - clientHeight < 150;
+    // Use a very small threshold so the user can easily "escape" the auto-scroll by scrolling up slightly.
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 20;
     shouldAutoScroll.current = isNearBottom;
   };
 
