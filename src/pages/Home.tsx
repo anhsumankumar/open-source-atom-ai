@@ -12,7 +12,7 @@ import { DataPrivacyModal } from '../components/modals/DataPrivacyModal';
 import { AboutModal } from '../components/modals/AboutModal';
 import { sendChatMessage } from '../services/nvidiaService';
 import type { ChatMessage } from '../services/nvidiaService';
-import { fetchConversations, fetchMessages, createConversation, saveMessage, deleteAllConversations } from '../services/chatService';
+import { fetchConversations, fetchMessages, createConversation, saveMessage, deleteAllConversations, overwriteConversationMessages } from '../services/chatService';
 import { DEFAULT_MODEL_ID } from '../data/models';
 import './Home.css';
 
@@ -242,17 +242,23 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
     }
   };
 
-  const handleEditMessage = (index: number, newContent: string) => {
+  const handleEditMessage = async (index: number, newContent: string) => {
     const previousMessages = messages.slice(0, index);
+    if (activeConversationId) {
+      await overwriteConversationMessages(activeConversationId, previousMessages);
+    }
     handleSendMessage(newContent, previousMessages);
   };
 
-  const handleRegenerateMessage = (index: number) => {
+  const handleRegenerateMessage = async (index: number) => {
     const previousMessages = messages.slice(0, index);
     const lastUserMsg = previousMessages[previousMessages.length - 1];
     
     if (lastUserMsg && lastUserMsg.role === 'user') {
       const msgsWithoutLast = previousMessages.slice(0, -1);
+      if (activeConversationId) {
+        await overwriteConversationMessages(activeConversationId, msgsWithoutLast);
+      }
       handleSendMessage(lastUserMsg.content, msgsWithoutLast);
     }
   };

@@ -62,6 +62,40 @@ export const saveMessage = async (conversationId: string, role: string, content:
   }
 };
 
+export const overwriteConversationMessages = async (conversationId: string, messages: ChatMessage[]) => {
+  const userId = await getCurrentUserId();
+  
+  // Delete all existing messages for this conversation
+  const { error: deleteError } = await supabase
+    .from('messages')
+    .delete()
+    .eq('conversation_id', conversationId)
+    .eq('user_id', userId);
+    
+  if (deleteError) {
+    console.error('Error deleting old messages:', deleteError);
+    return;
+  }
+  
+  // Re-insert the new history
+  if (messages.length > 0) {
+    const insertData = messages.map(msg => ({
+      conversation_id: conversationId,
+      user_id: userId,
+      role: msg.role,
+      content: msg.content
+    }));
+    
+    const { error: insertError } = await supabase
+      .from('messages')
+      .insert(insertData);
+      
+    if (insertError) {
+      console.error('Error re-inserting messages:', insertError);
+    }
+  }
+};
+
 export const deleteAllConversations = async () => {
   const userId = await getCurrentUserId();
   const { error } = await supabase
