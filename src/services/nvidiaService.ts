@@ -72,7 +72,7 @@ export const sendChatMessage = async (
   engineeringContext: { text: string; enabled: boolean; deepThinking?: boolean },
   onChunk?: (chunkInfo: { content: string, reasoning: string }) => void,
   signal?: AbortSignal
-): Promise<{ content: string, reasoning: string }> => {
+): Promise<{ content: string, reasoning: string, finishReason?: string }> => {
   
   // 1. Construct the payload array
   const payloadMessages: ChatMessage[] = [];
@@ -131,6 +131,7 @@ export const sendChatMessage = async (
     let fullResponse = '';
     let fullReasoning = '';
     let buffer = '';
+    let finishReason = '';
 
     while (true) {
       const { done, value } = await reader.read();
@@ -145,15 +146,23 @@ export const sendChatMessage = async (
         if (trimmed.startsWith('data: ') && trimmed !== 'data: [DONE]') {
           try {
             const parsed = JSON.parse(trimmed.slice(6));
-            if (parsed.choices && parsed.choices[0]?.delta) {
-              const deltaContent = parsed.choices[0].delta.content || '';
-              const reasoningContent = parsed.choices[0].delta.reasoning_content || '';
+            if (parsed.choices && parsed.choices.length > 0) {
+              const choice = parsed.choices[0];
               
-              if (deltaContent || reasoningContent) {
-                fullResponse += deltaContent;
-                fullReasoning += reasoningContent;
-                if (onChunk) {
-                  onChunk({ content: fullResponse, reasoning: fullReasoning });
+              if (choice.finish_reason) {
+                finishReason = choice.finish_reason;
+              }
+              
+              if (choice.delta) {
+                const deltaContent = choice.delta.content || '';
+                const reasoningContent = choice.delta.reasoning_content || '';
+                
+                if (deltaContent || reasoningContent) {
+                  fullResponse += deltaContent;
+                  fullReasoning += reasoningContent;
+                  if (onChunk) {
+                    onChunk({ content: fullResponse, reasoning: fullReasoning });
+                  }
                 }
               }
             }
@@ -164,7 +173,7 @@ export const sendChatMessage = async (
       }
     }
 
-    return { content: fullResponse, reasoning: fullReasoning };
+    return { content: fullResponse, reasoning: fullReasoning, finishReason };
   } catch (error: any) {
     if (error.name === 'AbortError') {
       console.log('Chat request aborted by user');

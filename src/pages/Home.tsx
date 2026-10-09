@@ -167,28 +167,55 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
     abortControllerRef.current = abortController;
 
     try {
-      const finalResult = await sendChatMessage(
-        baseMessages, 
-        selectedModel,
-        { text: engineeringContext, enabled: contextEnabled, deepThinking: deepThinkingEnabled },
-        (chunkInfo) => {
-          setIsWaitingForFirstChunk(false); 
-          setAllMessages(prev => prev.map(m => {
-            if (m.id === aiMsgId) {
-              const cleanContent = chunkInfo.content.replace(/<UPDATE_MEMORY>[\s\S]*?(?:<\/UPDATE_MEMORY>|$)/g, '');
-              return { ...m, content: cleanContent, reasoning: chunkInfo.reasoning };
-            }
-            return m;
-          }));
-        },
-        abortController.signal
-      );
+      let isFinished = false;
+      let currentMessagesForApi = [...baseMessages];
+      let cumulativeResponse = '';
+      let cumulativeReasoning = '';
+      let continuationCount = 0;
+      let finalCleanResponse = '';
+      const MAX_CONTINUATIONS = 3;
       
-      let cleanResponse = finalResult.content;
-      const memoryMatches = finalResult.content.match(/<UPDATE_MEMORY>([\s\S]*?)<\/UPDATE_MEMORY>/g);
+      while (!isFinished && !abortControllerRef.current?.signal.aborted && continuationCount <= MAX_CONTINUATIONS) {
+        const finalResult = await sendChatMessage(
+          currentMessagesForApi, 
+          selectedModel,
+          { text: engineeringContext, enabled: contextEnabled, deepThinking: deepThinkingEnabled },
+          (chunkInfo) => {
+            setIsWaitingForFirstChunk(false); 
+            setAllMessages(prev => prev.map(m => {
+              if (m.id === aiMsgId) {
+                const totalContent = cumulativeResponse + chunkInfo.content;
+                const totalReasoning = cumulativeReasoning + chunkInfo.reasoning;
+                const cleanContent = totalContent.replace(/<UPDATE_MEMORY>[\s\S]*?(?:<\/UPDATE_MEMORY>|$)/g, '');
+                return { ...m, content: cleanContent, reasoning: totalReasoning };
+              }
+              return m;
+            }));
+          },
+          abortControllerRef.current.signal
+        );
+        
+        cumulativeResponse += finalResult.content;
+        cumulativeReasoning += finalResult.reasoning;
+        
+        if (finalResult.finishReason === 'length') {
+          continuationCount++;
+          // Prepare for the next loop
+          currentMessagesForApi = [
+             ...currentMessagesForApi,
+             { role: 'assistant', content: finalResult.content },
+             { role: 'user', content: 'Continue generating exactly where you left off. Do not repeat anything from before. Start your response immediately with the continuation, without any conversational filler or introductions.' }
+          ];
+        } else {
+          isFinished = true;
+        }
+      }
+      
+      let cleanResponse = cumulativeResponse;
+      const memoryMatches = cumulativeResponse.match(/<UPDATE_MEMORY>([\s\S]*?)<\/UPDATE_MEMORY>/g);
       
       if (memoryMatches) {
-        cleanResponse = finalResult.content.replace(/<UPDATE_MEMORY>[\s\S]*?(?:<\/UPDATE_MEMORY>|$)/g, '').trim();
+        cleanResponse = cumulativeResponse.replace(/<UPDATE_MEMORY>[\s\S]*?(?:<\/UPDATE_MEMORY>|$)/g, '').trim();
         const newFacts = memoryMatches.map(m => m.replace(/<\/?UPDATE_MEMORY>/g, '').trim()).join('\n');
         if (newFacts) {
           const updatedContext = engineeringContext 
