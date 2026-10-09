@@ -16,6 +16,8 @@
   max-width: 85%;
   font-size: 18px;
   line-height: 1.6;
+  min-width: 0;
+  width: 100%;
 }
 
 /* Handwritten font for everything except code blocks and specific UI elements inside markdown */
@@ -101,13 +103,13 @@ body.dark-theme .atom-message .message-content strong {
   color: #fff;
 }
 
-/* Code blocks (override handwriting font) */
 .code-block-wrapper {
   margin: 16px 0;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border-color);
   font-family: var(--font-ui); /* Reset to UI font for code */
+  max-width: 100%;
 }
 
 .code-block-header {
