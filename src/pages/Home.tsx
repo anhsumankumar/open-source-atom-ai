@@ -189,8 +189,11 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
       );
       
       // Process autonomous memory
+      let cleanResponse = finalResult.content;
       const memoryMatches = finalResult.content.match(/<UPDATE_MEMORY>([\s\S]*?)<\/UPDATE_MEMORY>/g);
+      
       if (memoryMatches) {
+        cleanResponse = finalResult.content.replace(/<UPDATE_MEMORY>[\s\S]*?(?:<\/UPDATE_MEMORY>|$)/g, '').trim();
         const newFacts = memoryMatches.map(m => m.replace(/<\/?UPDATE_MEMORY>/g, '').trim()).join('\n');
         if (newFacts) {
           const updatedContext = engineeringContext 
@@ -199,6 +202,12 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
           handleSaveContext(updatedContext);
         }
       }
+      
+      // Save final AI response to Supabase EXACTLY ONCE
+      if (currentConvId) {
+        saveMessage(currentConvId, 'assistant', cleanResponse);
+      }
+      
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.log('User stopped the generation.');
@@ -219,20 +228,6 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
       abortControllerRef.current = null;
       setIsTyping(false);
       setIsWaitingForFirstChunk(false);
-      
-      // Save final AI response to Supabase after a short delay so React state is fully updated
-      if (currentConvId) {
-         setTimeout(() => {
-           setMessages(currentMessages => {
-              const last = currentMessages[currentMessages.length - 1];
-              if (last && last.role === 'assistant') {
-                 // Save to DB
-                 saveMessage(currentConvId!, last.role, last.content);
-              }
-              return currentMessages;
-           });
-         }, 500);
-      }
     }
   };
 
