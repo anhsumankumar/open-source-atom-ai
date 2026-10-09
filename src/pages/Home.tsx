@@ -54,6 +54,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const shouldAutoScroll = useRef(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
@@ -158,6 +159,9 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
       const emptyAiMsg: ChatMessage = { role: 'assistant', content: '' };
       setMessages(prev => [...prev, emptyAiMsg]);
 
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+
       await sendChatMessage(
         newMessages, 
         selectedModel,
@@ -176,7 +180,8 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
             }
             return updated;
           });
-        }
+        },
+        abortController.signal
       );
       
       // Save final AI response to Supabase
@@ -188,6 +193,11 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
         // or just wait a tick. Actually, we can just save it after the promise resolves by looking at the last message.
       }
     } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.log('User stopped the generation.');
+        return; // Exit early, the partial message is already in state
+      }
+      
       console.error(error);
       setMessages(prev => {
         const updated = [...prev];
@@ -199,6 +209,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
         return [...prev, { role: 'assistant', content: `**Error**: ${error.message}` }];
       });
     } finally {
+      abortControllerRef.current = null;
       setIsTyping(false);
       
       // Save final AI response to Supabase after a short delay so React state is fully updated
@@ -214,6 +225,12 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
            });
          }, 500);
       }
+    }
+  };
+
+  const handleStopMessage = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
   };
 
@@ -305,6 +322,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
             )}
             <ChatComposer 
               onSend={handleSendMessage} 
+              onStop={handleStopMessage}
               initialValue={composerInitialValue}
               onAddContextClick={() => setIsContextModalOpen(true)}
               contextEnabled={contextEnabled}

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Triangle, ChevronDown, Send } from 'lucide-react';
+import { Triangle, ChevronDown, Send, Square } from 'lucide-react';
 import './ChatComposer.css';
 
 interface ChatComposerProps {
   onSend: (message: string) => void;
+  onStop?: () => void;
   initialValue?: string;
   onAddContextClick: () => void;
   contextEnabled: boolean;
@@ -19,6 +20,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   contextEnabled,
   onContextEnabledChange,
   isTyping = false,
+  onStop,
   onTextChange
 }) => {
   const [input, setInput] = useState(initialValue);
@@ -78,9 +80,15 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           </div>
           
           <div className="actions-right">
-            <button className="send-btn" onClick={handleSend} disabled={isTyping || !input.trim()}>
-              <Send size={18} />
-            </button>
+            {isTyping ? (
+              <button className="send-btn stop-btn" onClick={onStop}>
+                <Square size={14} fill="currentColor" />
+              </button>
+            ) : (
+              <button className="send-btn" onClick={handleSend} disabled={!input.trim()}>
+                <Send size={18} />
+              </button>
+            )}
           </div>
         </div>
         <div className="composer-footer">

@@ -70,7 +70,8 @@ export const sendChatMessage = async (
   messages: ChatMessage[], 
   modelId: string,
   engineeringContext: { text: string; enabled: boolean },
-  onChunk?: (chunkInfo: { content: string, reasoning: string }) => void
+  onChunk?: (chunkInfo: { content: string, reasoning: string }) => void,
+  signal?: AbortSignal
 ): Promise<{ content: string, reasoning: string }> => {
   
   // 1. Construct the payload array
@@ -102,6 +103,7 @@ export const sendChatMessage = async (
       headers: {
         'Content-Type': 'application/json'
       },
+      signal,
       body: JSON.stringify({
         model: resolvedModelId,
         messages: payloadMessages
@@ -156,7 +158,11 @@ export const sendChatMessage = async (
     }
 
     return { content: fullResponse, reasoning: fullReasoning };
-  } catch (error) {
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      console.log('Chat request aborted by user');
+      throw error;
+    }
     console.error('NVIDIA Service Error:', error);
     throw error;
   }
