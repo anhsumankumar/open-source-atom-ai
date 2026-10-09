@@ -81,7 +81,7 @@ export const sendChatMessage = async (
   let finalSystemPrompt = atomEngineeringSystemPrompt;
   
   if (engineeringContext.deepThinking) {
-    finalSystemPrompt += `\n\n[DEEP THINKING MODE ENABLED]\nCRITICAL INSTRUCTION: You are in Deep Thinking Mode. You must exhaustively analyze the problem. Think step-by-step in extreme detail. Generate maximum context, explore edge cases, provide mathematical proofs or deep architectural breakdowns if applicable, and leave no stone unturned. Your output should be comprehensive and jaw-droppingly detailed. Do not abbreviate or summarize; expand on everything. IMPORTANT: ALWAYS format any code using proper markdown code blocks (e.g. \`\`\`python) - NEVER output raw code as plain text.`;
+    finalSystemPrompt += `\n\n[DEEP THINKING MODE ENABLED]\nCRITICAL INSTRUCTION: You are in Deep Thinking Mode. You must exhaustively analyze the problem. Think step-by-step in extreme detail. Generate maximum context, explore edge cases, provide mathematical proofs or deep architectural breakdowns if applicable, and leave no stone unturned. Your output should be comprehensive and jaw-droppingly detailed. Do not abbreviate or summarize; expand on everything. IMPORTANT: When providing code, group it logically into large, well-structured markdown code blocks (e.g. \`\`\`python). DO NOT create separate code blocks for every single line or filename. Use inline backticks (\`) for single words or filenames, not full code blocks.`;
   }
   
   payloadMessages.push({
