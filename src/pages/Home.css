@@ -17,14 +17,17 @@
   height: 100vh;
   position: relative;
   transition: margin-left 0.3s ease;
+  min-width: 0;
 }
 
 .content-scrollable {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden; /* Ensure no horizontal scrolling on viewport */
   display: flex;
   flex-direction: column;
   padding: 0 32px 0px;
+  min-width: 0;
 }
 
 .empty-state {
@@ -47,6 +50,7 @@
   flex-direction: column;
   gap: 24px;
   padding-top: 32px;
+  min-width: 0;
 }
 
 

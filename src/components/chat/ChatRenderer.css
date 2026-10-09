@@ -2,6 +2,8 @@
   width: 100%;
   display: flex;
   margin-bottom: 24px;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .user-message {
