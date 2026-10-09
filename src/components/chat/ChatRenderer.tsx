@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
+import remarkBreaks from 'remark-breaks';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -11,7 +12,7 @@ import './ChatRenderer.css';
 const CodeBlock = ({ node, inline, className, children, ...props }: any) => {
   const [copied, setCopied] = React.useState(false);
   const match = /language-(\w+)/.exec(className || '');
-  const language = match ? match[1] : '';
+  const language = match ? match[1] : 'text';
   const codeContent = String(children).replace(/\n$/, '');
 
   const handleCopy = () => {
@@ -20,7 +21,7 @@ const CodeBlock = ({ node, inline, className, children, ...props }: any) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (!inline && match) {
+  if (!inline) {
     return (
       <div className="code-block-wrapper">
         <div className="code-block-header">
@@ -147,7 +148,7 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({
           </details>
         )}
         <ReactMarkdown
-          remarkPlugins={[remarkMath]}
+          remarkPlugins={[remarkMath, remarkBreaks]}
           rehypePlugins={[rehypeKatex]}
           components={{
             // Custom renderers for specific markdown elements

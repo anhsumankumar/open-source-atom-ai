@@ -81,7 +81,7 @@ export const sendChatMessage = async (
   let finalSystemPrompt = atomEngineeringSystemPrompt;
   
   if (engineeringContext.deepThinking) {
-    finalSystemPrompt += `\n\n[DEEP THINKING MODE ENABLED]\nCRITICAL INSTRUCTION: You are in Deep Thinking Mode. You must exhaustively analyze the problem. Think step-by-step in extreme detail. Generate maximum context, explore edge cases, provide mathematical proofs or deep architectural breakdowns if applicable, and leave no stone unturned. Your output should be comprehensive and jaw-droppingly detailed. Do not abbreviate or summarize; expand on everything.`;
+    finalSystemPrompt += `\n\n[DEEP THINKING MODE ENABLED]\nCRITICAL INSTRUCTION: You are in Deep Thinking Mode. You must exhaustively analyze the problem. Think step-by-step in extreme detail. Generate maximum context, explore edge cases, provide mathematical proofs or deep architectural breakdowns if applicable, and leave no stone unturned. Your output should be comprehensive and jaw-droppingly detailed. Do not abbreviate or summarize; expand on everything. IMPORTANT: ALWAYS format any code using proper markdown code blocks (e.g. \`\`\`python) - NEVER output raw code as plain text.`;
   }
   
   payloadMessages.push({
