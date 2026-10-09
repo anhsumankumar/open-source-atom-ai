@@ -153,15 +153,6 @@ export const sendChatMessage = async (
             // ignore partial JSON parse errors
           }
         }
-      }
-    }
-
-    // Stream finished, append a visual indicator
-    if (fullResponse.trim().length > 0) {
-      fullResponse += "\n\n— ATOM ✨";
-      if (onChunk) {
-        onChunk({ content: fullResponse, reasoning: fullReasoning });
-      }
     }
 
     return { content: fullResponse, reasoning: fullReasoning };
