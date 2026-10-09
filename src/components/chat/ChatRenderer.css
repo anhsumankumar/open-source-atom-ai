@@ -135,8 +135,22 @@ body.dark-theme .code-block-header {
   background-color: #FFFFFF;
   overflow-x: auto;
   font-size: 14px;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+}
+
+/* Make scrollbar visible on mobile for code blocks */
+.code-block::-webkit-scrollbar {
+  height: 6px;
+}
+.code-block::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 4px;
+}
+.code-block::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+.code-block::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
 }
 
 body.dark-theme .code-block {
