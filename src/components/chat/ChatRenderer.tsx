@@ -89,11 +89,19 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({ content, isUser, rea
             </div>
           ) : (
             <div className="message-bubble-wrapper">
-              <div className="message-bubble" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>{content}</span>
-                {onEdit && (
-                  <button className="edit-btn" onClick={() => setIsEditing(true)} title="Edit Message">
-                    <Edit2 size={12} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                <div className="message-bubble" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>{content}</span>
+                  {onEdit && (
+                    <button className="edit-btn" onClick={() => setIsEditing(true)} title="Edit Message">
+                      <Edit2 size={12} />
+                    </button>
+                  )}
+                </div>
+                {onRegenerate && (
+                  <button className="regenerate-btn" onClick={onRegenerate} title="Regenerate Response">
+                    <RotateCw size={12} />
+                    <span>Regenerate</span>
                   </button>
                 )}
               </div>
@@ -127,14 +135,6 @@ export const ChatRenderer: React.FC<ChatRendererProps> = ({ content, isUser, rea
         >
           {content}
         </ReactMarkdown>
-        {onRegenerate && (
-          <div className="message-footer">
-            <button className="regenerate-btn" onClick={onRegenerate} title="Regenerate Response">
-              <RotateCw size={14} />
-              <span>Regenerate</span>
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

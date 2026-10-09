@@ -246,15 +246,14 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
   };
 
   const handleRegenerateMessage = async (index: number) => {
-    const previousMessages = messages.slice(0, index);
-    const lastUserMsg = previousMessages[previousMessages.length - 1];
+    const userMsg = messages[index];
     
-    if (lastUserMsg && lastUserMsg.role === 'user') {
-      const msgsWithoutLast = previousMessages.slice(0, -1);
+    if (userMsg && userMsg.role === 'user') {
+      const previousMessages = messages.slice(0, index);
       if (activeConversationId) {
-        await overwriteConversationMessages(activeConversationId, msgsWithoutLast);
+        await overwriteConversationMessages(activeConversationId, previousMessages);
       }
-      handleSendMessage(lastUserMsg.content, msgsWithoutLast);
+      handleSendMessage(userMsg.content, previousMessages);
     }
   };
 
@@ -341,7 +340,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
                   isUser={msg.role === 'user'} 
                   reasoning={msg.reasoning} 
                   onEdit={msg.role === 'user' ? (newContent) => handleEditMessage(idx, newContent) : undefined}
-                  onRegenerate={msg.role === 'assistant' && !isTyping ? () => handleRegenerateMessage(idx) : undefined}
+                  onRegenerate={msg.role === 'user' && !isTyping ? () => handleRegenerateMessage(idx) : undefined}
                 />
               ))}
               {isWaitingForFirstChunk && (
