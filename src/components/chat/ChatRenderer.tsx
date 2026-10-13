@@ -144,11 +144,11 @@ export const ChatRenderer = React.memo<ChatRendererProps>(({
       <div className="message-content">
         {reasoning && (
           <details 
-            className="thinking-block" 
+            className="thinking-container" 
             open={isThinkingOpen} 
             onToggle={(e: any) => setIsThinkingOpen(e.currentTarget.open)}
           >
-            <summary className="thinking-summary">ATOM's Thought Process</summary>
+            <summary className="thinking-summary">ATOM is thinking</summary>
             <div className="thinking-content">
               {isThinkingOpen && <ReactMarkdown>{reasoning}</ReactMarkdown>}
             </div>
