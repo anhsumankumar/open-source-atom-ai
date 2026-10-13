@@ -408,7 +408,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
               })}
               {isWaitingForFirstChunk && (
                 <div className="message atom-message fade-in">
-                  <div className="message-content handwriting-text" style={{ color: 'var(--text-secondary)', opacity: 0.7 }}>
+                  <div className="message-content" style={{ color: 'var(--text-secondary)', opacity: 0.7 }}>
                     ATOM is thinking...
                   </div>
                 </div>

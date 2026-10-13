@@ -91,7 +91,7 @@ export const ChatRenderer = React.memo<ChatRendererProps>(({
   if (isUser) {
     return (
       <div className="message user-message group">
-        <div className="message-content handwriting-text">
+        <div className="message-content">
           {isEditing ? (
             <div className="message-edit-container">
               <textarea 
@@ -141,7 +141,7 @@ export const ChatRenderer = React.memo<ChatRendererProps>(({
 
   return (
     <div className="message atom-message">
-      <div className="message-content handwriting-text">
+      <div className="message-content">
         {reasoning && (
           <details 
             className="thinking-block" 

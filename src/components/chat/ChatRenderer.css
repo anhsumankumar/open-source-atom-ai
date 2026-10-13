@@ -16,16 +16,18 @@
 
 .message-content {
   max-width: 85%;
-  font-size: 18px;
-  line-height: 1.6;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.68;
   min-width: 0;
   width: 100%;
+  letter-spacing: -0.01em;
 }
 
 /* Handwritten font for everything except code blocks and specific UI elements inside markdown */
 .handwriting-text {
-  font-family: var(--font-handwriting);
-  letter-spacing: 0.5px;
+  font-family: var(--font-ui);
+  letter-spacing: normal;
 }
 
 /* User message specific styling */
@@ -43,10 +45,13 @@
 
 /* Message Bubble (Only for User now) */
 .message-bubble {
-  padding: 16px 20px;
-  border-radius: 20px;
+  padding: 12px 18px;
+  border-radius: 18px;
   display: inline-block;
   text-align: left;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .message-bubble-wrapper {
@@ -167,16 +172,17 @@ body.dark-theme .user-message .message-bubble {
 .atom-message .message-content h1,
 .atom-message .message-content h2,
 .atom-message .message-content h3 {
-  font-family: var(--font-handwriting);
-  font-weight: 700;
-  margin-top: 24px;
-  margin-bottom: 12px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  margin-top: 22px;
+  margin-bottom: 10px;
   color: var(--text-primary);
+  letter-spacing: -0.015em;
 }
 
-.atom-message .message-content h1 { font-size: 1.5em; }
-.atom-message .message-content h2 { font-size: 1.3em; }
-.atom-message .message-content h3 { font-size: 1.1em; }
+.atom-message .message-content h1 { font-size: 1.35em; }
+.atom-message .message-content h2 { font-size: 1.2em; }
+.atom-message .message-content h3 { font-size: 1.08em; }
 
 .atom-message .message-content ul,
 .atom-message .message-content ol {
@@ -339,12 +345,12 @@ body.dark-theme .thinking-block {
 
 .thinking-content {
   padding: 0 16px 16px 16px;
-  font-family: var(--font-handwriting);
-  font-size: 15px;
+  font-family: var(--font-ui);
+  font-size: 13.5px;
   color: var(--text-secondary);
   border-top: 1px solid transparent;
-  line-height: 1.5;
-  opacity: 0.8;
+  line-height: 1.6;
+  opacity: 0.85;
 }
 
 .message-footer {
