@@ -12,6 +12,27 @@
   z-index: 10;
   box-sizing: border-box;
   overflow-y: auto;
+  overflow-x: hidden !important;
+}
+
+/* Strictly eliminate horizontal scrollbar */
+.sidebar::-webkit-scrollbar:horizontal {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
 }
 
 .brand {
@@ -155,6 +176,7 @@
 .recent-list {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden !important;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -173,6 +195,16 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.recent-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
 }
 
 .recent-item:hover {
@@ -194,6 +226,9 @@
   border-radius: 12px;
   cursor: pointer;
   transition: background 0.2s;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .user-profile:hover {
@@ -204,6 +239,15 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .avatar {
@@ -228,6 +272,9 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-plan {
@@ -258,8 +305,8 @@
 .sidebar-resizer {
   position: absolute;
   top: 0;
-  right: -3px;
-  width: 6px;
+  right: 0;
+  width: 4px;
   height: 100%;
   cursor: col-resize;
   z-index: 100;
