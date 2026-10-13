@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Triangle, ChevronDown, Send, Square, Mic, MicOff } from 'lucide-react';
 import './ChatComposer.css';
 

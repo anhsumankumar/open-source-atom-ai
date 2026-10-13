@@ -6,7 +6,7 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Copy, Check, Edit2, RotateCw, X } from 'lucide-react';
+import { Copy, Check, Edit2, RotateCw } from 'lucide-react';
 import './ChatRenderer.css';
 
 const CodeBlock = ({ node, inline, className, children, ...props }: any) => {
@@ -16,7 +16,9 @@ const CodeBlock = ({ node, inline, className, children, ...props }: any) => {
   const codeContent = String(children).replace(/\n$/, '');
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(codeContent);
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(codeContent).catch(() => {});
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -166,9 +168,9 @@ export const ChatRenderer = React.memo<ChatRendererProps>(({
         </ReactMarkdown>
         {!isUser && siblingCount > 1 && (
           <div className="branch-controls atom-branch">
-            <button onClick={onPrevBranch} disabled={currentIndex === 0}>{'<'}</button>
-            <span>{currentIndex + 1} / {siblingCount}</span>
-            <button onClick={onNextBranch} disabled={currentIndex === siblingCount - 1}>{'>'}</button>
+            <button className="branch-btn" onClick={onPrevBranch} disabled={currentIndex === 0}>{'<'}</button>
+            <span className="branch-text">{currentIndex + 1} / {siblingCount}</span>
+            <button className="branch-btn" onClick={onNextBranch} disabled={currentIndex === siblingCount - 1}>{'>'}</button>
           </div>
         )}
       </div>
@@ -179,5 +181,6 @@ export const ChatRenderer = React.memo<ChatRendererProps>(({
          prev.reasoning === next.reasoning &&
          prev.currentIndex === next.currentIndex &&
          prev.siblingCount === next.siblingCount &&
-         prev.isUser === next.isUser;
+         prev.isUser === next.isUser &&
+         (prev.onRegenerate === undefined) === (next.onRegenerate === undefined);
 });

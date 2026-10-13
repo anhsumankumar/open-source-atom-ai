@@ -32,10 +32,11 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
   
   const messages = React.useMemo(() => {
     const branch: DBMessage[] = [];
-    let curr = allMessages.find(m => m.id === activeLeafId);
+    let curr: DBMessage | undefined = allMessages.find(m => m.id === activeLeafId);
     while (curr) {
       branch.unshift(curr);
-      curr = allMessages.find(m => m.id === curr.parent_id);
+      const parentId: string | null | undefined = curr.parent_id;
+      curr = parentId ? allMessages.find(m => m.id === parentId) : undefined;
     }
     return branch;
   }, [allMessages, activeLeafId]);
@@ -96,9 +97,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
       // Ctrl/Cmd + N for New Chat
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
         e.preventDefault();
-        setMessages([]);
-        setActiveConversationId(null);
-        setComposerInitialValue('');
+        handleNewChat();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -268,7 +267,8 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
       let curr: DBMessage | undefined = msg;
       while (curr) {
         branch.unshift(curr);
-        curr = allMessages.find(m => m.id === curr?.parent_id);
+        const parentId: string | null | undefined = curr.parent_id;
+        curr = parentId ? allMessages.find(m => m.id === parentId) : undefined;
       }
       await generateAiResponse(activeConversationId, msg.id, branch);
     }
