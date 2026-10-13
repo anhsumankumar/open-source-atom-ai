@@ -340,6 +340,9 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
           onOpenContextManager={() => setIsContextModalOpen(true)}
           onOpenPrivacyModal={() => setIsPrivacyModalOpen(true)}
           onOpenAboutModal={() => setIsAboutModalOpen(true)}
+          conversations={conversations}
+          onSelectConversation={handleSelectConversation}
+          onSearchAsk={handleSendMessage}
         />
         
         <div className="content-scrollable" ref={scrollRef} onScroll={handleScroll}>
