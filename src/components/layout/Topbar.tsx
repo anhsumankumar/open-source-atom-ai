@@ -170,9 +170,10 @@ export const Topbar: React.FC<TopbarProps> = ({
   return (
     <header className="topbar">
       <button 
-        className="icon-btn sidebar-toggle-btn mobile-only" 
+        className={`icon-btn sidebar-toggle-btn mobile-only ${isSidebarOpen ? 'active' : ''}`} 
         onClick={toggleSidebar}
-        style={{ visibility: isSidebarOpen ? 'hidden' : 'visible' }}
+        aria-label={isSidebarOpen ? "Close menu" : "Open menu"}
+        title={isSidebarOpen ? "Close menu" : "Open menu"}
       >
         <Menu size={24} color="var(--text-primary)" />
       </button>

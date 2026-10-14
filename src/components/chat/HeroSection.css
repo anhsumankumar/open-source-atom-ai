@@ -141,30 +141,42 @@
 }
 
 @media (max-width: 768px) {
+  .hero-section {
+    padding: 0 12px;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
   .hero-main-title {
-    font-size: 60px;
-    transform: rotate(-10deg) translateX(-40px);
+    font-size: 52px;
+    transform: rotate(-8deg) translateX(0);
+    text-align: center;
+    margin-bottom: 4px;
   }
   .hero-subtitle {
     margin-left: 0;
-    gap: 12px;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
   }
   .im-text {
-    font-size: 36px;
+    font-size: 32px;
   }
   .atom-text {
-    font-size: 72px;
+    font-size: 58px;
   }
   .highlighted-text {
-    font-size: 15px;
+    font-size: 14px;
     text-align: center;
     line-height: 1.4;
+    padding: 0 8px;
   }
   .actions-text {
-    font-size: 16px;
+    font-size: 15px;
+    text-align: center;
   }
-  .doodle-atom, .doodle-text-blue {
-    display: none;
+  .doodle-atom, .doodle-text-blue, .doodle-text-black {
+    display: none !important;
   }
 }
 

@@ -33,7 +33,7 @@ function App() {
   }, []);
 
   if (loading) {
-    return <div style={{ backgroundColor: '#000', height: '100vh', width: '100vw' }} />;
+    return <div style={{ backgroundColor: '#000', height: '100dvh', width: '100%' }} />;
   }
 
   if (!session) {

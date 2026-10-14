@@ -22,7 +22,14 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = ({ session }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const isMobileDevice = 
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      (('ontouchstart' in window || navigator.maxTouchPoints > 1) && Math.min(window.screen.width, window.screen.height) < 800) ||
+      window.innerWidth <= 768;
+    return !isMobileDevice;
+  });
   
   // Chat State
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -84,7 +91,11 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsSidebarOpen(window.innerWidth > 768);
+      const isMobileDevice = 
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        (('ontouchstart' in window || navigator.maxTouchPoints > 1) && Math.min(window.screen.width, window.screen.height) < 800) ||
+        window.innerWidth <= 768;
+      setIsSidebarOpen(!isMobileDevice);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -313,9 +324,7 @@ export const Home: React.FC<HomeProps> = ({ session }) => {
       <div 
         className={`mobile-sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
         onClick={() => {
-          if (window.innerWidth <= 768) {
-            setIsSidebarOpen(false);
-          }
+          setIsSidebarOpen(false);
         }}
       />
       <Sidebar 
